@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AirQuality</string>
+    <string name="zero_hint">00</string>
+    <string name="temperature">Temperature:</string>
+    <string name="air_quality">Air Quality:</string>
+    <string name="dust">Dust:</string>
+</resources>
