@@ -1,5 +1,5 @@
 package com.esp8266collection.airquality;
 
 public interface UpdateCallback {
-    void Update(String[] parts);
+    void Update(SensorsCollection sensorsCollection, String date);
 }

@@ -10,4 +10,5 @@
     <string name="degrees">℃</string>
     <string name="dustUnit">μg/m³</string>
     <string name="dustCircle">Dust circle</string>
+    <string name="updateText">Update:&#160;</string>
 </resources>

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.esp8266collection.airquality.Enums.SensorName;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,13 +21,20 @@ public class ServerConnectionThread extends Thread {
     private UpdateCallback updateCallback;
     int i = 0;
     private boolean run = true;
+    private SensorsCollection sensorsCollection;
 
-    ServerConnectionThread(UpdateCallback updateCallback){
+    ServerConnectionThread(UpdateCallback updateCallback) {
         this.updateCallback = updateCallback;
+        this.sensorsCollection = new SensorsCollection();
+
+        sensorsCollection.addSensor(SensorName.TemperatureSensor);
+        sensorsCollection.addSensor(SensorName.AirQSensor);
+        sensorsCollection.addSensor(SensorName.DustSensor);
     }
+
     @Override
     public void run() {
-        while(run){
+        while (run) {
             try {
                 URL url = new URL("http://esp8266collection.keep.pl/json/get_data.php");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -41,9 +50,10 @@ public class ServerConnectionThread extends Thread {
                 String data = string.substring(0, index);
 
                 String[] parts = data.split("&");
-                float number = Float.parseFloat(parts[2]);
-                parts[2] = new DecimalFormat("##.##").format(number);
-                updateCallback.Update(parts);
+                sensorsCollection.updateSensor(SensorName.TemperatureSensor, parts[0]);
+                sensorsCollection.updateSensor(SensorName.AirQSensor, parts[1]);
+                sensorsCollection.updateSensor(SensorName.DustSensor, parts[2]);
+                updateCallback.Update(sensorsCollection, parts[3]);
 
                 Thread.sleep(5000);
                 i++;
@@ -57,5 +67,10 @@ public class ServerConnectionThread extends Thread {
             }
         }
 
+
+    }
+
+    public void setRun(boolean run) {
+        this.run = run;
     }
 }

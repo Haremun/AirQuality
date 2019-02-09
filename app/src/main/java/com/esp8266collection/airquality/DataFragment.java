@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.esp8266collection.airquality.Enums.SensorName;
+
 import java.text.DecimalFormat;
 import java.util.Objects;
 
@@ -22,6 +24,7 @@ public class DataFragment extends Fragment implements UpdateCallback {
     private TextView textTemp;
     private TextView textAirQ;
     private TextView textDust;
+    private TextView textUpdate;
 
     public DataFragment() {
         // Required empty public constructor
@@ -36,6 +39,7 @@ public class DataFragment extends Fragment implements UpdateCallback {
         textTemp = view.findViewById(R.id.textTemp);
         textAirQ = view.findViewById(R.id.textAirQ);
         textDust = view.findViewById(R.id.textDust);
+        textUpdate = view.findViewById(R.id.textUpdate);
 
         ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
         serverConnectionThread.start();
@@ -44,14 +48,15 @@ public class DataFragment extends Fragment implements UpdateCallback {
     }
 
     @Override
-    public void Update(final String[] parts) {
+    public void Update(final SensorsCollection sensorsCollection, final String date) {
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
-                textTemp.setText(parts[0]);
-                textAirQ.setText(parts[1]);
-                textDust.setText(parts[2]);
+                textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
+                textAirQ.setText(sensorsCollection.getSensorValue(SensorName.AirQSensor));
+                textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor));
+                textUpdate.setText(date);
 
             }
         });
