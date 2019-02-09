@@ -1,5 +1,6 @@
 package com.esp8266collection.airquality;
 
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,37 +17,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements UpdateCallback {
+public class MainActivity extends AppCompatActivity {
 
-    TextView textTemp;
-    TextView textAirQ;
-    TextView textDust;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textTemp = findViewById(R.id.textTemp);
-        textAirQ = findViewById(R.id.textAirQ);
-        textDust = findViewById(R.id.textDust);
+        DataFragment dataFragment = new DataFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, dataFragment);
+        transaction.commit();
 
-        ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
-        serverConnectionThread.start();
-
-
-    }
-
-    @Override
-    public void Update(final String[] parts) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                textTemp.setText(parts[0]);
-                textAirQ.setText(parts[1]);
-                textDust.setText(parts[2]);
-
-            }
-        });
     }
 }

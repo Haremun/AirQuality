@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 
 public class ServerConnectionThread extends Thread {
 
@@ -39,6 +40,8 @@ public class ServerConnectionThread extends Thread {
                 String data = string.substring(0, index);
 
                 String[] parts = data.split("&");
+                float number = Float.parseFloat(parts[0]);
+                parts[2] = new DecimalFormat("##.##").format(number);
                 updateCallback.Update(parts);
 
                 Thread.sleep(5000);
