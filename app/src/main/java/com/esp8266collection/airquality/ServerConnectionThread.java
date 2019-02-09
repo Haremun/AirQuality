@@ -16,15 +16,16 @@ import java.text.DecimalFormat;
 
 public class ServerConnectionThread extends Thread {
 
-    UpdateCallback updateCallback;
+    private UpdateCallback updateCallback;
     int i = 0;
+    private boolean run = true;
 
     ServerConnectionThread(UpdateCallback updateCallback){
         this.updateCallback = updateCallback;
     }
     @Override
     public void run() {
-        while(i < 100){
+        while(run){
             try {
                 URL url = new URL("http://esp8266collection.keep.pl/json/get_data.php");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -40,7 +41,7 @@ public class ServerConnectionThread extends Thread {
                 String data = string.substring(0, index);
 
                 String[] parts = data.split("&");
-                float number = Float.parseFloat(parts[0]);
+                float number = Float.parseFloat(parts[2]);
                 parts[2] = new DecimalFormat("##.##").format(number);
                 updateCallback.Update(parts);
 
