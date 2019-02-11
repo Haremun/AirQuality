@@ -19,7 +19,6 @@ import java.text.DecimalFormat;
 public class ServerConnectionThread extends Thread {
 
     private UpdateCallback updateCallback;
-    int i = 0;
     private boolean run = true;
     private SensorsCollection sensorsCollection;
 
@@ -50,13 +49,14 @@ public class ServerConnectionThread extends Thread {
                 String data = string.substring(0, index);
 
                 String[] parts = data.split("&");
+
                 sensorsCollection.updateSensor(SensorName.TemperatureSensor, parts[0]);
+                sensorsCollection.getSensor(SensorName.TemperatureSensor).roundToUnits();
                 sensorsCollection.updateSensor(SensorName.AirQSensor, parts[1]);
                 sensorsCollection.updateSensor(SensorName.DustSensor, parts[2]);
                 updateCallback.Update(sensorsCollection, parts[3]);
 
                 Thread.sleep(5000);
-                i++;
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();

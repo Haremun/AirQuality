@@ -1,5 +1,8 @@
 package com.esp8266collection.airquality;
 
+import android.support.v4.math.MathUtils;
+import android.util.Log;
+
 import com.esp8266collection.airquality.Enums.SensorName;
 
 import java.text.DecimalFormat;
@@ -23,5 +26,10 @@ public class Sensor {
 
     public SensorName getSensorName() {
         return sensorName;
+    }
+
+    public void roundToUnits(){
+        sensorValue = Math.round(sensorValue);
+        //Log.i("Sensor", Float.toString(sensorValue));
     }
 }

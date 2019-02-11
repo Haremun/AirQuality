@@ -4,6 +4,7 @@ package com.esp8266collection.airquality;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class DataFragment extends Fragment implements UpdateCallback {
                 textAirQ.setText(sensorsCollection.getSensorValue(SensorName.AirQSensor));
                 textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor));
                 textUpdate.setText(date);
+                //Log.i("Sensor", "Update");
 
             }
         });
