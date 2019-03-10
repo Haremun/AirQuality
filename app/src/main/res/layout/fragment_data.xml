@@ -5,6 +5,27 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".DataFragment">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_drawsvg"
+        android:contentDescription="@string/dustCircle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:paddingTop="45dp"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/small_circle"
+        android:contentDescription="@string/dustCircle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="5dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:tint="#aaa"/>
 
     <ImageView
         android:id="@+id/imgCircle"
@@ -38,25 +59,44 @@
         android:textSize="12sp"/>
 
 
-    <LinearLayout
-        android:id="@+id/layoutTemp"
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toRightOf="@+id/imgCircle"
-        app:layout_constraintBottom_toTopOf="@id/imgCircle">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="155dp"
+        android:layout_marginBottom="155dp"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/small_circle"
+            android:scaleY="0.8"
+            android:scaleX="0.8"
+            android:contentDescription="@string/dustCircle"/>
+        <LinearLayout
+            android:id="@+id/layoutTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
         <TextView
             android:id="@+id/textTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/zero_hint"
-            android:textSize="24sp"/>
+            android:textSize="18sp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:text="@string/degrees"/>
-    </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+
 
    <LinearLayout
        android:layout_width="wrap_content"
