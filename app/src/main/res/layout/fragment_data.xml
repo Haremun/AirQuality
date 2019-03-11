@@ -6,26 +6,51 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".DataFragment">
     <ImageView
+        android:id="@+id/img_pollution_circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_drawsvg"
+        android:src="@drawable/draw_pollution_circle"
         android:contentDescription="@string/dustCircle"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:paddingTop="45dp"/>
+        android:layout_marginBottom="0dp"
+        android:layout_marginStart="0dp"
+        android:rotation="0"/>
     <ImageView
+        android:id="@+id/img_pollution_small_circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/small_circle"
+        android:src="@drawable/draw_pollution_small_circle"
         android:contentDescription="@string/dustCircle"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_margin="5dp"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
-        android:tint="#aaa"/>
+        android:rotation="305"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="0dp"/>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/small_circle"
+            android:contentDescription="@string/dustCircle"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:tint="#aaa"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_settings"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
 
     <ImageView
         android:id="@+id/imgCircle"
@@ -58,6 +83,28 @@
         android:text="@string/dustUnit"
         android:textSize="12sp"/>
 
+    <LinearLayout
+        app:layout_constraintTop_toBottomOf="@+id/imgCircle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="good"
+            android:layout_weight="1"
+            android:layout_marginEnd="75dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="bad"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -66,8 +113,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginStart="155dp"
-        android:layout_marginBottom="155dp"
+        android:layout_marginStart="220dp"
+        android:layout_marginBottom="220dp"
         >
         <ImageView
             android:layout_width="wrap_content"
@@ -96,34 +143,13 @@
         </LinearLayout>
     </FrameLayout>
 
-
-
-   <LinearLayout
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:orientation="horizontal"
-       android:padding="15dp"
-       app:layout_constraintRight_toRightOf="parent"
-       app:layout_constraintBottom_toTopOf="@+id/textDust">
-
-       <TextView
-           android:id="@+id/textAirQ"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:hint="@string/zero_hint"
-           android:textSize="24sp"/>
-       <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text=""/>
-
-   </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/imgCircle"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_margin="10dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="10dp"
         android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
