@@ -20,7 +20,8 @@ import java.util.Objects;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DataFragment extends Fragment implements UpdateCallback {
+public class DataFragment extends Fragment
+        implements UpdateCallback, RotationCallback{
 
 
     private TextView textTemp;
@@ -29,6 +30,8 @@ public class DataFragment extends Fragment implements UpdateCallback {
     private ImageView imgPollSmallCircle;
     private ImageView imgPollCircle;
     private ImageView imgCircle;
+
+    private RotationThread rotationThread;
 
     public DataFragment() {
         // Required empty public constructor
@@ -50,11 +53,16 @@ public class DataFragment extends Fragment implements UpdateCallback {
         ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
         serverConnectionThread.start();
 
+        rotationThread = new RotationThread(this);
+        rotationThread.start();
+        rotationThread.startAnimation(0, 305);
+
         return view;
     }
 
     @Override
     public void Update(final SensorsCollection sensorsCollection, final String date) {
+        rotationThread.stopAnimation();
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -92,5 +100,17 @@ public class DataFragment extends Fragment implements UpdateCallback {
             red = 255;
 
         return Color.rgb(red, green,0);
+    }
+
+    @Override
+    public void AnimationUpdate(final int percent, final int angle) {
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                imgPollSmallCircle.setRotation(angle);
+                imgPollCircle.setColorFilter(greenToRedColor(percent));
+            }
+        });
     }
 }
