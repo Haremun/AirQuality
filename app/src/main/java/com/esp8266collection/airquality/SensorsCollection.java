@@ -5,10 +5,10 @@ import com.esp8266collection.airquality.Enums.SensorName;
 import java.util.LinkedList;
 import java.util.List;
 
-class SensorsCollection {
+public class SensorsCollection {
     private List<Sensor> sensors;
 
-    SensorsCollection() {
+    public SensorsCollection() {
         sensors = new LinkedList<>();
     }
 

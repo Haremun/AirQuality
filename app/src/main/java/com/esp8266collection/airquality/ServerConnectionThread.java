@@ -1,9 +1,8 @@
 package com.esp8266collection.airquality;
 
-import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 
+import com.esp8266collection.airquality.Callbacks.UpdateCallback;
 import com.esp8266collection.airquality.Enums.SensorName;
 
 import java.io.BufferedInputStream;
@@ -14,7 +13,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DecimalFormat;
 
 public class ServerConnectionThread extends Thread {
 
@@ -37,6 +35,8 @@ public class ServerConnectionThread extends Thread {
             try {
                 URL url = new URL("http://esp8266collection.keep.pl/json/get_data.php");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                //connection.setReadTimeout(2000);
+                //connection.connect();
                 InputStream inputStream = new BufferedInputStream(connection.getInputStream());
                 BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder total = new StringBuilder();
@@ -54,9 +54,11 @@ public class ServerConnectionThread extends Thread {
                 sensorsCollection.getSensor(SensorName.TemperatureSensor).roundToUnits();
                 sensorsCollection.updateSensor(SensorName.AirQSensor, parts[1]);
                 sensorsCollection.updateSensor(SensorName.DustSensor, parts[2]);
+                Log.i("Update", "Update");
                 updateCallback.Update(sensorsCollection, parts[3]);
 
                 Thread.sleep(5000);
+
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" android:drawable="@drawable/draw_frame">
+    <target android:name="top_line" android:animation="@animator/hide_top" />
+    <target android:name="bottom_line" android:animation="@animator/hide_bottom" />
+    <target android:name="half_circle" android:animation="@animator/hide_circle" />
+
+</animated-vector>

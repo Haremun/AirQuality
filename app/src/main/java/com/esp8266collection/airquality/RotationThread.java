@@ -1,5 +1,7 @@
 package com.esp8266collection.airquality;
 
+import com.esp8266collection.airquality.Callbacks.RotationCallback;
+
 public class RotationThread extends Thread {
 
     private boolean animationStart = false;
@@ -40,7 +42,7 @@ public class RotationThread extends Thread {
             }
             callback.AnimationUpdate(percent, angle);
             try {
-                Thread.sleep(20);
+                Thread.sleep(30);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

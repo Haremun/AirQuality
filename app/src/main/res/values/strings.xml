@@ -11,4 +11,10 @@
     <string name="dustUnit">μg/m³</string>
     <string name="dustCircle">Dust circle</string>
     <string name="updateText">Update:&#160;</string>
+    <string name="string_pollution_low">good</string>
+    <string name="string_pollution_high">bad</string>
+    <string name="content_desc_settings">settings</string>
+    <string name="content_desc_conn_type">connection type</string>
+    <string name="desc_pollution_open_circle">pollution open circle</string>
+    <string name="desc_pollution_small_circle">pollution small circle</string>
 </resources>
