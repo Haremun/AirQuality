@@ -40,7 +40,7 @@ public class DataFragment extends Fragment
     private FrameLayout btnConnect;
     private TextView textInfo;
 
-    boolean temp = false;
+    boolean connectionError = false;
 
     public DataFragment() {
         // Required empty public constructor
@@ -62,40 +62,28 @@ public class DataFragment extends Fragment
         btnConnect = view.findViewById(R.id.btn_connect);
         textInfo = view.findViewById(R.id.text_info);
 
-        final AnimationCallback animationCallback = this;
-        btnConnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Drawable drawable;
-                if (!temp) {
-                    drawable = getResources().getDrawable(R.drawable.show_information_frame);
-                    temp = true;
-                } else {
-                    drawable = getResources().getDrawable(R.drawable.hide_information_frame);
-                    temp = false;
-                }
-                imgFrame.setImageDrawable(drawable);
-                AnimatedVectorDrawable animatedVectorDrawable = (AnimatedVectorDrawable) imgFrame.getDrawable();
-                animatedVectorDrawable.start();
-                AnimationTask animationTask = new AnimationTask(animationCallback);
-                animationTask.execute(temp);
-            }
-        });
-
         ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
         serverConnectionThread.start();
 
-
-        rotationThread = new RotationThread(this);
-        rotationThread.start();
-        rotationThread.startAnimation(0, 305);
 
         return view;
     }
 
     @Override
     public void Update(final SensorsCollection sensorsCollection, final String date) {
-        rotationThread.stopAnimation();
+        if (connectionError){
+            rotationThread.stopAnimation();
+
+            connectionError = false;
+            Drawable drawable;
+            drawable = getResources().getDrawable(R.drawable.hide_information_frame);
+            imgFrame.setImageDrawable(drawable);
+            AnimatedVectorDrawable animatedVectorDrawable = (AnimatedVectorDrawable) imgFrame.getDrawable();
+            animatedVectorDrawable.start();
+            AnimationTask animationTask = new AnimationTask(this);
+            animationTask.execute(connectionError);
+        }
+
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -118,6 +106,24 @@ public class DataFragment extends Fragment
         });
     }
 
+    @Override
+    public void onConnectionError() {
+        if(!connectionError){
+            Drawable drawable;
+            drawable = getResources().getDrawable(R.drawable.show_information_frame);
+            connectionError = true;
+            imgFrame.setImageDrawable(drawable);
+            AnimatedVectorDrawable animatedVectorDrawable = (AnimatedVectorDrawable) imgFrame.getDrawable();
+            animatedVectorDrawable.start();
+            AnimationTask animationTask = new AnimationTask(this);
+            animationTask.execute(connectionError);
+
+            rotationThread = new RotationThread(this);
+            rotationThread.start();
+            rotationThread.startAnimation(0, 305);
+        }
+    }
+
     private int greenToRedColor(float percent) {
         int green = 255;
         int red = 0;
@@ -137,7 +143,7 @@ public class DataFragment extends Fragment
     }
 
     @Override
-    public void AnimationUpdate(final int percent, final int angle) {
+    public void onRotationUpdate(final int percent, final int angle) {
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -150,7 +156,7 @@ public class DataFragment extends Fragment
 
     @Override
     public void onAnimationEnd() {
-        if (temp)
+        if (connectionError)
             textInfo.setText("No connection");
         else
             textInfo.setText("");

@@ -35,41 +35,52 @@ public class ServerConnectionThread extends Thread {
             try {
                 URL url = new URL("http://esp8266collection.keep.pl/json/get_data.php");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                //connection.setReadTimeout(2000);
-                //connection.connect();
-                InputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder total = new StringBuilder();
-                for (String line; (line = r.readLine()) != null; ) {
-                    total.append(line).append('\n');
+
+                if (checkConnection(connection)) {
+                    InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                    BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder total = new StringBuilder();
+                    for (String line; (line = r.readLine()) != null; ) {
+                        total.append(line).append('\n');
+                    }
+                    String string = total.toString();
+                    char symbol = '%';
+                    int index = string.indexOf(symbol);
+                    String data = string.substring(0, index);
+
+                    String[] parts = data.split("&");
+
+                    sensorsCollection.updateSensor(SensorName.TemperatureSensor, parts[0]);
+                    sensorsCollection.getSensor(SensorName.TemperatureSensor).roundToUnits();
+                    sensorsCollection.updateSensor(SensorName.AirQSensor, parts[1]);
+                    sensorsCollection.updateSensor(SensorName.DustSensor, parts[2]);
+
+                    updateCallback.Update(sensorsCollection, parts[3]);
+                } else {
+                    updateCallback.onConnectionError();
                 }
-                String string = total.toString();
-                char symbol = '%';
-                int index = string.indexOf(symbol);
-                String data = string.substring(0, index);
-
-                String[] parts = data.split("&");
-
-                sensorsCollection.updateSensor(SensorName.TemperatureSensor, parts[0]);
-                sensorsCollection.getSensor(SensorName.TemperatureSensor).roundToUnits();
-                sensorsCollection.updateSensor(SensorName.AirQSensor, parts[1]);
-                sensorsCollection.updateSensor(SensorName.DustSensor, parts[2]);
-                Log.i("Update", "Update");
-                updateCallback.Update(sensorsCollection, parts[3]);
-
-                Thread.sleep(5000);
-
-
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            try {
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
 
+    }
+
+    private boolean checkConnection(HttpURLConnection connection) {
+        try {
+            connection.connect();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     public void setRun(boolean run) {

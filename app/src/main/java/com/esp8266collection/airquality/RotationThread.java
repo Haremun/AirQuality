@@ -40,7 +40,7 @@ public class RotationThread extends Thread {
             if (percent <= 0){
                 animationUp = true;
             }
-            callback.AnimationUpdate(percent, angle);
+            callback.onRotationUpdate(percent, angle);
             try {
                 Thread.sleep(30);
             } catch (InterruptedException e) {
