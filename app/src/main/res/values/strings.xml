@@ -17,6 +17,6 @@
     <string name="content_desc_conn_type">connection type</string>
     <string name="desc_pollution_open_circle">pollution open circle</string>
     <string name="desc_pollution_small_circle">pollution small circle</string>
-    <string name="pm2_5">PM 2,5:</string>
+    <string name="pm25">PM 2,5:</string>
     <string name="pm10">PM 10:</string>
 </resources>

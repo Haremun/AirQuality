@@ -2,8 +2,6 @@ package com.esp8266collection.airquality;
 
 
 import android.graphics.Color;
-import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -91,7 +89,7 @@ public class DataFragment extends Fragment
 
                 else {
                     mainCircleData = MainCircleData.PM25;
-                    textPmType.setText(getResources().getString(R.string.pm2_5));
+                    textPmType.setText(getResources().getString(R.string.pm25));
                     textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
                     textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
                 }
@@ -118,6 +116,7 @@ public class DataFragment extends Fragment
                     imageConnection.setImageDrawable(
                             getResources().getDrawable(R.drawable.ic_bluetooth_white_24dp));
 
+                    v.setClickable(false);
                     toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "Bluetooth mode");
 
                     connectionMode = ConnectionMode.BluetoothConnection;
@@ -125,6 +124,7 @@ public class DataFragment extends Fragment
                     imageConnection.setImageDrawable(
                             getResources().getDrawable(R.drawable.ic_wifi_white_24dp));
 
+                    v.setClickable(false);
                     toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "WiFi mode");
 
                     connectionMode = ConnectionMode.WiFiConnection;
@@ -243,6 +243,16 @@ public class DataFragment extends Fragment
             @Override
             public void run() {
                 textInfo.setText("");
+            }
+        });
+    }
+
+    @Override
+    public void onToastEnd() {
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                btnConnect.setClickable(true);
             }
         });
     }

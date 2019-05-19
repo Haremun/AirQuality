@@ -32,39 +32,41 @@ public class ToastDrawerAnimation extends Thread {
     @Override
     public void run() {
         while (!_animationDone) {
-            switch (_toastType) {
-                case 0: {
-                    try {
+            try {
+                switch (_toastType) {
+                    case 0: {
                         show();
                         Thread.sleep(400);
                         _animationCallback.onToastShow(_toastText);
                         Thread.sleep(1000);
                         _animationCallback.onToastHide();
                         hide();
+                        Thread.sleep(400);
+                        _animationCallback.onToastEnd();
                         _toastType = -1;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        break;
                     }
-                    break;
-                }
-                case 1: {
-                    try {
+                    case 1: {
                         show();
                         Thread.sleep(400);
                         _animationCallback.onToastShow(_toastText);
+                        _animationCallback.onToastEnd();
                         _toastType = -1;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        break;
                     }
-                    break;
+                    case 2: {
+                        hide();
+                        Thread.sleep(400);
+                        _animationCallback.onToastHide();
+                        _animationCallback.onToastEnd();
+                        _toastType = -1;
+                        break;
+                    }
                 }
-                case 2: {
-                    hide();
-                    _animationCallback.onToastHide();
-                    _toastType = -1;
-                    break;
-                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+
         }
     }
 
@@ -72,6 +74,7 @@ public class ToastDrawerAnimation extends Thread {
         this._toastType = toastType;
         this._toastText = text;
     }
+
     public void startToast(int toastType) {
         this._toastType = toastType;
         this._toastText = "";
@@ -84,6 +87,7 @@ public class ToastDrawerAnimation extends Thread {
         AnimatedVectorDrawable animatedVectorDrawable = (AnimatedVectorDrawable) _imageView.getDrawable();
         animatedVectorDrawable.start();
     }
+
     private void hide() {
         Drawable drawable;
         drawable = _context.getResources().getDrawable(R.drawable.hide_information_frame);
