@@ -6,6 +6,7 @@ import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.esp8266collection.airquality.Callbacks.AnimationCallback;
 import com.esp8266collection.airquality.Callbacks.RotationCallback;
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
 import com.esp8266collection.airquality.Enums.ConnectionMode;
+import com.esp8266collection.airquality.Enums.MainCircleData;
 import com.esp8266collection.airquality.Enums.SensorName;
 
 import java.util.Objects;
@@ -29,22 +31,27 @@ import java.util.Objects;
 public class DataFragment extends Fragment
         implements UpdateCallback, RotationCallback, AnimationCallback {
 
-
+    //Text views
     private TextView textTemp;
     private TextView textDust;
     private TextView textDust2;
     private TextView textUpdate;
+    private TextView textInfo;
+    //Image views
     private ImageView imgPollSmallCircle;
     private ImageView imgPollCircle;
     private ImageView imgCircle;
     private ImageView imgFrame;
-    private RotationThread rotationThread;
+    //Layouts
     private FrameLayout btnConnect;
-    private TextView textInfo;
-
+    private ConstraintLayout mainCircleLayout;
+    //Threads
+    private RotationThread rotationThread;
     private ToastDrawerAnimation toastDrawerAnimation;
 
-    boolean connectionError = false;
+    private boolean connectionError = false;
+    private MainCircleData mainCircleData = MainCircleData.PM25;
+    private SensorsCollection sensorsCollection;
 
     public DataFragment() {
         // Required empty public constructor
@@ -68,6 +75,28 @@ public class DataFragment extends Fragment
         imgCircle = view.findViewById(R.id.imgCircle);
 
         textInfo = view.findViewById(R.id.text_info);
+
+        final TextView textPmType = view.findViewById(R.id.textPmType);
+
+        mainCircleLayout = view.findViewById(R.id.layout_dust);
+        mainCircleLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mainCircleData == MainCircleData.PM25) {
+                    mainCircleData = MainCircleData.PM10;
+                    textPmType.setText(getResources().getString(R.string.pm10));
+                    textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                    textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                }
+
+                else {
+                    mainCircleData = MainCircleData.PM25;
+                    textPmType.setText(getResources().getString(R.string.pm2_5));
+                    textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                    textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                }
+            }
+        });
 
 
         final ImageView imageConnection = view.findViewById(R.id.imageConnection);
@@ -122,13 +151,21 @@ public class DataFragment extends Fragment
             connectionError = false;
         }
 
+        this.sensorsCollection = sensorsCollection;
+
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
                 textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
-                textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
-                textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                if (mainCircleData == MainCircleData.PM25){
+                    textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                    textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                } else {
+                    textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                    textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                }
+
                 float dustPercent = (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.DustSensor25)) / 200) * 100;
                 imgCircle.setColorFilter(greenToRedColor(dustPercent));
 
