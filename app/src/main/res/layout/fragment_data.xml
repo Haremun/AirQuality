@@ -71,6 +71,7 @@
                 android:src="@drawable/draw_circle_button" />
 
             <ImageView
+                android:id="@+id/imageConnection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -111,7 +112,7 @@
             android:contentDescription=
                 "@string/desc_pollution_small_circle" />
 
-
+        <!-- DUST SENSOR LAYOUT 1 -->
         <android.support.constraint.ConstraintLayout
             android:id="@+id/layout_dust"
             android:layout_width="wrap_content"
@@ -126,6 +127,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/circle"
                 android:contentDescription="@string/dustCircle" />
+            <!-- DUST SENSOR VALUE 1 -->
             <TextView
                 android:id="@+id/textDust"
                 android:layout_width="wrap_content"
@@ -146,7 +148,7 @@
                 android:textSize="12sp"/>
         </android.support.constraint.ConstraintLayout>
 
-
+        <!-- GOOD -> BAD DESC -->
         <LinearLayout
             app:layout_constraintTop_toBottomOf="@+id/layout_dust"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -168,6 +170,41 @@
                 android:text="@string/string_pollution_high"
                 android:layout_weight="1"/>
         </LinearLayout>
+
+        <!-- DUST SENSOR LAYOUT 2 -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf=
+                "@id/img_pollution_circle"
+            app:layout_constraintRight_toLeftOf=
+                "@id/img_pollution_circle"
+            android:layout_marginStart="5dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/small_circle"
+                android:contentDescription="@string/dustCircle"/>
+            <!-- DUST SENSOR VALUE 2 -->
+            <LinearLayout
+                android:id="@+id/layoutDust10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+                <TextView
+                    android:id="@+id/textDust10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/zero_hint"
+                    android:textSize="18sp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dustUnit"
+                    android:textSize="8sp"/>
+            </LinearLayout>
+        </FrameLayout>
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -180,8 +217,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/small_circle"
-                android:scaleY="0.8"
-                android:scaleX="0.8"
+                android:scaleY="0.9"
+                android:scaleX="0.9"
                 android:contentDescription="@string/dustCircle"/>
             <LinearLayout
                 android:id="@+id/layoutTemp"

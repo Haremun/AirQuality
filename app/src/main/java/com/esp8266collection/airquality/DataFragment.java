@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.esp8266collection.airquality.Callbacks.AnimationCallback;
 import com.esp8266collection.airquality.Callbacks.RotationCallback;
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
+import com.esp8266collection.airquality.Enums.ConnectionMode;
 import com.esp8266collection.airquality.Enums.SensorName;
 
 import java.util.Objects;
@@ -31,6 +32,7 @@ public class DataFragment extends Fragment
 
     private TextView textTemp;
     private TextView textDust;
+    private TextView textDust2;
     private TextView textUpdate;
     private ImageView imgPollSmallCircle;
     private ImageView imgPollCircle;
@@ -39,6 +41,8 @@ public class DataFragment extends Fragment
     private RotationThread rotationThread;
     private FrameLayout btnConnect;
     private TextView textInfo;
+
+    private ToastDrawerAnimation toastDrawerAnimation;
 
     boolean connectionError = false;
 
@@ -53,14 +57,52 @@ public class DataFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_data, container, false);
 
         textTemp = view.findViewById(R.id.textTemp);
+
         textDust = view.findViewById(R.id.textDust);
+        textDust2 = view.findViewById(R.id.textDust10);
+
         textUpdate = view.findViewById(R.id.textUpdate);
+
         imgPollSmallCircle = view.findViewById(R.id.img_pollution_small_circle);
         imgPollCircle = view.findViewById(R.id.img_pollution_circle);
         imgCircle = view.findViewById(R.id.imgCircle);
-        imgFrame = view.findViewById(R.id.img_frame);
-        btnConnect = view.findViewById(R.id.btn_connect);
+
         textInfo = view.findViewById(R.id.text_info);
+
+
+        final ImageView imageConnection = view.findViewById(R.id.imageConnection);
+
+        imgFrame = view.findViewById(R.id.img_frame);
+        toastDrawerAnimation =
+                new ToastDrawerAnimation(getContext(), this, imgFrame);
+        toastDrawerAnimation.start();
+
+
+        btnConnect = view.findViewById(R.id.btn_connect);
+        btnConnect.setOnClickListener(new View.OnClickListener() {
+
+            private ConnectionMode connectionMode = ConnectionMode.WiFiConnection;
+
+            @Override
+            public void onClick(View v) {
+                if (connectionMode == ConnectionMode.WiFiConnection) {
+                    imageConnection.setImageDrawable(
+                            getResources().getDrawable(R.drawable.ic_bluetooth_white_24dp));
+
+                    toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "Bluetooth mode");
+
+                    connectionMode = ConnectionMode.BluetoothConnection;
+                } else {
+                    imageConnection.setImageDrawable(
+                            getResources().getDrawable(R.drawable.ic_wifi_white_24dp));
+
+                    toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "WiFi mode");
+
+                    connectionMode = ConnectionMode.WiFiConnection;
+                }
+
+            }
+        });
 
         ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
         serverConnectionThread.start();
@@ -71,17 +113,13 @@ public class DataFragment extends Fragment
 
     @Override
     public void Update(final SensorsCollection sensorsCollection, final String date) {
-        if (connectionError){
+
+        if (connectionError) {
+
             rotationThread.stopAnimation();
+            toastDrawerAnimation.startToast(ToastDrawerAnimation.HIDE);
 
             connectionError = false;
-            Drawable drawable;
-            drawable = getResources().getDrawable(R.drawable.hide_information_frame);
-            imgFrame.setImageDrawable(drawable);
-            AnimatedVectorDrawable animatedVectorDrawable = (AnimatedVectorDrawable) imgFrame.getDrawable();
-            animatedVectorDrawable.start();
-            AnimationTask animationTask = new AnimationTask(this);
-            animationTask.execute(connectionError);
         }
 
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
@@ -89,8 +127,9 @@ public class DataFragment extends Fragment
             public void run() {
 
                 textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
-                textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor));
-                float dustPercent = (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.DustSensor)) / 200) * 100;
+                textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                float dustPercent = (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.DustSensor25)) / 200) * 100;
                 imgCircle.setColorFilter(greenToRedColor(dustPercent));
 
                 textUpdate.setText(date);
@@ -108,19 +147,15 @@ public class DataFragment extends Fragment
 
     @Override
     public void onConnectionError() {
-        if(!connectionError){
-            Drawable drawable;
-            drawable = getResources().getDrawable(R.drawable.show_information_frame);
-            connectionError = true;
-            imgFrame.setImageDrawable(drawable);
-            AnimatedVectorDrawable animatedVectorDrawable = (AnimatedVectorDrawable) imgFrame.getDrawable();
-            animatedVectorDrawable.start();
-            AnimationTask animationTask = new AnimationTask(this);
-            animationTask.execute(connectionError);
+        if (!connectionError) {
+
+            toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW, "No connection");
 
             rotationThread = new RotationThread(this);
             rotationThread.start();
             rotationThread.startAnimation(0, 305);
+
+            connectionError = true;
         }
     }
 
@@ -155,10 +190,23 @@ public class DataFragment extends Fragment
     }
 
     @Override
-    public void onAnimationEnd() {
-        if (connectionError)
-            textInfo.setText("No connection");
-        else
-            textInfo.setText("");
+    public void onToastShow(final String text) {
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textInfo.setText(text);
+            }
+        });
+
+    }
+
+    @Override
+    public void onToastHide() {
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textInfo.setText("");
+            }
+        });
     }
 }

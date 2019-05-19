@@ -1,7 +1,5 @@
 package com.esp8266collection.airquality;
 
-import android.util.Log;
-
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
 import com.esp8266collection.airquality.Enums.SensorName;
 
@@ -26,7 +24,8 @@ public class ServerConnectionThread extends Thread {
 
         sensorsCollection.addSensor(SensorName.TemperatureSensor);
         sensorsCollection.addSensor(SensorName.AirQSensor);
-        sensorsCollection.addSensor(SensorName.DustSensor);
+        sensorsCollection.addSensor(SensorName.DustSensor25);
+        sensorsCollection.addSensor(SensorName.DustSensor10);
     }
 
     @Override
@@ -53,9 +52,10 @@ public class ServerConnectionThread extends Thread {
                     sensorsCollection.updateSensor(SensorName.TemperatureSensor, parts[0]);
                     sensorsCollection.getSensor(SensorName.TemperatureSensor).roundToUnits();
                     sensorsCollection.updateSensor(SensorName.AirQSensor, parts[1]);
-                    sensorsCollection.updateSensor(SensorName.DustSensor, parts[2]);
+                    sensorsCollection.updateSensor(SensorName.DustSensor25, parts[2]);
+                    sensorsCollection.updateSensor(SensorName.DustSensor10, parts[3]);
 
-                    updateCallback.Update(sensorsCollection, parts[3]);
+                    updateCallback.Update(sensorsCollection, parts[4]);
                 } else {
                     updateCallback.onConnectionError();
                 }
