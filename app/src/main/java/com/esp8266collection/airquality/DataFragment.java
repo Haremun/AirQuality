@@ -99,17 +99,34 @@ public class DataFragment extends Fragment
         mainCircleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { //Adding onClick listener
-                if (mainCircleData == MainCircleData.PM25) { //Changing for TABLE_NAME_PM_10 mode
+
+                float dustPercentMainCircle;
+                float dustPercentSmallCircle;
+
+                if (mainCircleData == MainCircleData.PM25) { //Changing for PM10 mode
                     mainCircleData = MainCircleData.PM10;
                     textPmType.setText(getResources().getString(R.string.pm10));
                     textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
                     textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+
+                    dustPercentMainCircle =
+                            (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
+                    dustPercentSmallCircle =
+                            (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
                 } else {                                    //Changing for PM25 mode
                     mainCircleData = MainCircleData.PM25;
                     textPmType.setText(getResources().getString(R.string.pm25));
                     textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
                     textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+
+                    dustPercentMainCircle =
+                            (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
+                    dustPercentSmallCircle =
+                            (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
                 }
+
+                imgCircle.setColorFilter(greenToRedColor(dustPercentMainCircle));
+                imgDustSmallCircle.setColorFilter(greenToRedColor(dustPercentSmallCircle));
             }
         });
 
