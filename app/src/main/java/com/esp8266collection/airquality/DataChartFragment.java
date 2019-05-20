@@ -42,60 +42,19 @@ public class DataChartFragment extends Fragment implements DatabaseCallback {
 
         chart = view.findViewById(R.id.chart);
 
-        SQLiteHelper helper = new SQLiteHelper(getContext()); //żeby wycieku nie było
-        LoadFromDatabaseTask task = new LoadFromDatabaseTask(helper, this);
-        task.execute();
-
         Legend legend = chart.getLegend();
         legend.setForm(Legend.LegendForm.CIRCLE);
 
-        /*List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(1, 5));
-        entries.add(new Entry(2, 5));
-        entries.add(new Entry(3, 6));
-        entries.add(new Entry(4, 5));
-        entries.add(new Entry(5, 7));
-        entries.add(new Entry(6, 7));
-        entries.add(new Entry(7, 10));
-        entries.add(new Entry(8, 10));
-        entries.add(new Entry(9, 8));
-        entries.add(new Entry(10, 7));
-        entries.add(new Entry(11, 7));
-        entries.add(new Entry(12, 5));
+        //Starting load task when view is created
+        updateChart();
 
-        List<Entry> entries2 = new ArrayList<>();
-        entries2.add(new Entry(1, 10));
-        entries2.add(new Entry(2, 11));
-        entries2.add(new Entry(3, 12));
-        entries2.add(new Entry(4, 14));
-        entries2.add(new Entry(5, 12));
-        entries2.add(new Entry(6, 12));
-        entries2.add(new Entry(7, 12));
-        entries2.add(new Entry(8, 12));
-        entries2.add(new Entry(9, 13));
-        entries2.add(new Entry(10, 10));
-        entries2.add(new Entry(11, 9));
-        entries2.add(new Entry(12, 9));*/
-
-        /*LineDataSet dataSet = new LineDataSet(entries, "PM 2,5"); // add entries to dataset
-        dataSet.setColor(Color.GREEN);
-        dataSet.setValueTextColor(Color.RED); // styling, ...
-
-
-        LineDataSet dataSet2 = new LineDataSet(entries2, "PM 10"); // add entries to dataset
-        dataSet2.setColor(Color.RED);
-        dataSet2.setValueTextColor(Color.BLUE); // styling, ...
-
-
-        List<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(dataSet);
-        dataSets.add(dataSet2);
-
-        LineData lineData = new LineData(dataSets);
-        chart.setData(lineData);
-
-        chart.invalidate(); // refresh*/
         return view;
+    }
+
+    public void updateChart(){
+        SQLiteHelper helper = new SQLiteHelper(getContext());
+        LoadFromDatabaseTask task = new LoadFromDatabaseTask(helper, this);
+        task.execute();
     }
 
     @Override
@@ -104,12 +63,11 @@ public class DataChartFragment extends Fragment implements DatabaseCallback {
         if (dustValuesList != null) {
             List<Entry> entriesPm25 = new ArrayList<>();
             List<Entry> entriesPm10 = new ArrayList<>();
-            int i = 1;
-            for (DustValues values :
-                    dustValuesList) {
+
+            for (int i = 1; i < dustValuesList.size(); i++) {
+                DustValues values = dustValuesList.get(dustValuesList.size() - i); //reverse data
                 entriesPm10.add(new Entry(i, values.getPm10()));
                 entriesPm25.add(new Entry(i, values.getPm25()));
-                i++;
             }
 
             LineDataSet dataSetPm25 = new LineDataSet(entriesPm25, "PM 2,5"); // add entries to dataset

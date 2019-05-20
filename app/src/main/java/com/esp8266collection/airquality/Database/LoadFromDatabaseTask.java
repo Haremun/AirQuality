@@ -5,8 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
 import com.esp8266collection.airquality.Callbacks.DatabaseCallback;
-import com.esp8266collection.airquality.Database.DatabaseStructure;
-import com.esp8266collection.airquality.Database.SQLiteHelper;
 import com.esp8266collection.airquality.DustValues;
 
 import java.util.ArrayList;
@@ -28,18 +26,10 @@ public class LoadFromDatabaseTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        SQLiteDatabase db = helper.getReadableDatabase();
 
-        Cursor cursor = db.query(
-                DatabaseStructure.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                "id DESC",
-                "12"
-        );
+        DatabaseFunctions databaseFunctions = new DatabaseFunctions(helper);
+
+        Cursor cursor = databaseFunctions.getFromDatabase("12");
 
         while (cursor.moveToNext()) {
             DustValues dustValues =

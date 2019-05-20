@@ -16,6 +16,8 @@ import android.widget.TextView;
 import com.esp8266collection.airquality.Callbacks.AnimationCallback;
 import com.esp8266collection.airquality.Callbacks.RotationCallback;
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
+import com.esp8266collection.airquality.Database.DatabaseFunctions;
+import com.esp8266collection.airquality.Database.SQLiteHelper;
 import com.esp8266collection.airquality.Enums.ConnectionMode;
 import com.esp8266collection.airquality.Enums.MainCircleData;
 import com.esp8266collection.airquality.Enums.SensorName;
@@ -56,6 +58,11 @@ public class DataFragment extends Fragment
     private TemperatureMode temperatureMode = TemperatureMode.Celsius;
     private SensorsCollection sensorsCollection;
 
+    private SQLiteHelper helper;
+    private DataChartFragment dataChartFragment;
+
+    private String actualUpdateDate = "";
+
     public DataFragment() {
         // Required empty public constructor
     }
@@ -90,7 +97,7 @@ public class DataFragment extends Fragment
         mainCircleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { //Adding onClick listener
-                if (mainCircleData == MainCircleData.PM25) { //Changing for PM10 mode
+                if (mainCircleData == MainCircleData.PM25) { //Changing for TABLE_NAME_PM_10 mode
                     mainCircleData = MainCircleData.PM10;
                     textPmType.setText(getResources().getString(R.string.pm10));
                     textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
@@ -164,6 +171,9 @@ public class DataFragment extends Fragment
             }
         });
 
+        //Creating new sqlite helper
+        helper = new SQLiteHelper(getContext());
+
         //Starting connection with server and getting updates
         ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
         serverConnectionThread.start();
@@ -184,42 +194,61 @@ public class DataFragment extends Fragment
 
         this.sensorsCollection = sensorsCollection;
 
-        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        if (!actualUpdateDate.equals(date)){
 
-                if (temperatureMode == TemperatureMode.Celsius) {
-                    textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
-                    textTempUnit.setText(getResources().getString(R.string.celsius_unit));
-                } else {
-                    float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
-                    int value = (int)((temp * 1.8) + 32);
-                    textTemp.setText(String.valueOf(value));
-                    textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
-                }
+            actualUpdateDate = date;
 
-                if (mainCircleData == MainCircleData.PM25) {
-                    textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
-                    textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
-                } else {
-                    textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
-                    textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
-                }
+            //Adding new data to local database
+            DatabaseFunctions databaseFunctions = new DatabaseFunctions(helper);
+            databaseFunctions.addToDatabase((int)sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue(),
+                    (int)sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue());
 
-                float dustPercent = (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.DustSensor25)) / 200) * 100;
-                imgCircle.setColorFilter(greenToRedColor(dustPercent));
-
-                textUpdate.setText(date);
-                float pollutionPercent =
-                        (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.AirQSensor)) / 255) * 100;
-                float angle = (pollutionPercent * 305) / 100;
-                imgPollSmallCircle.setRotation(angle);
-
-
-                imgPollCircle.setColorFilter(greenToRedColor(pollutionPercent));
-
+            //Update chart
+            if (dataChartFragment != null){
+                dataChartFragment.updateChart();
             }
-        });
+
+            //Update views with new data
+            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    if (temperatureMode == TemperatureMode.Celsius) {
+                        textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
+                        textTempUnit.setText(getResources().getString(R.string.celsius_unit));
+                    } else {
+                        float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
+                        int value = (int)((temp * 1.8) + 32);
+                        textTemp.setText(String.valueOf(value));
+                        textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
+                    }
+
+                    if (mainCircleData == MainCircleData.PM25) {
+                        textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                        textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                    } else {
+                        textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                        textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                    }
+
+                    float dustPercent = (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.DustSensor25)) / 200) * 100;
+                    imgCircle.setColorFilter(greenToRedColor(dustPercent));
+
+                    textUpdate.setText(date);
+                    float pollutionPercent =
+                            (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.AirQSensor)) / 255) * 100;
+                    float angle = (pollutionPercent * 305) / 100;
+                    imgPollSmallCircle.setRotation(angle);
+
+
+                    imgPollCircle.setColorFilter(greenToRedColor(pollutionPercent));
+
+                }
+            });
+        }
+
+
+
     }
 
     @Override
@@ -252,6 +281,10 @@ public class DataFragment extends Fragment
             red = 255;
 
         return Color.rgb(red, green, 0);
+    }
+
+    public void setDataChartFragment(DataChartFragment dataChartFragment) {
+        this.dataChartFragment = dataChartFragment;
     }
 
     @Override

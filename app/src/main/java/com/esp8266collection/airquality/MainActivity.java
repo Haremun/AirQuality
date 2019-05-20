@@ -23,5 +23,7 @@ public class MainActivity extends AppCompatActivity {
         transaction2.replace(R.id.fragment_chart_container, dataChartFragment);
         transaction2.commit();
 
+        dataFragment.setDataChartFragment(dataChartFragment);
+
     }
 }
