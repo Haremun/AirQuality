@@ -1,15 +1,16 @@
 <resources>
     <string name="app_name">AirQuality</string>
-    <string name="zero_hint">00</string>
+    <string name="zero_hint">0</string>
     <string name="temperature">Temperature:</string>
     <string name="air_quality">Air Quality:</string>
     <string name="dust">Dust:</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="degrees">℃</string>
-    <string name="dustUnit">μg/m³</string>
-    <string name="dustCircle">Dust circle</string>
+    <string name="celsius_unit">℃</string>
+    <string name="fahrenheit_unit">℉</string>
+    <string name="dust_unit">μg/m³</string>
+    <string name="dust_circle">Dust circle</string>
     <string name="updateText">Update:&#160;</string>
     <string name="string_pollution_low">good</string>
     <string name="string_pollution_high">bad</string>

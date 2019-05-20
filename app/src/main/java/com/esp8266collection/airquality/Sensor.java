@@ -20,8 +20,12 @@ public class Sensor {
         sensorValue = Float.parseFloat(value);
     }
 
-    public String getValue(){
+    public String getStringValue(){
         return new DecimalFormat("###.##").format(sensorValue);
+    }
+
+    public float getSensorValue() {
+        return sensorValue;
     }
 
     public SensorName getSensorName() {

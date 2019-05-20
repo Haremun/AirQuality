@@ -19,6 +19,7 @@ import com.esp8266collection.airquality.Callbacks.UpdateCallback;
 import com.esp8266collection.airquality.Enums.ConnectionMode;
 import com.esp8266collection.airquality.Enums.MainCircleData;
 import com.esp8266collection.airquality.Enums.SensorName;
+import com.esp8266collection.airquality.Enums.TemperatureMode;
 
 import java.util.Objects;
 
@@ -35,6 +36,7 @@ public class DataFragment extends Fragment
     private TextView textDust2;
     private TextView textUpdate;
     private TextView textInfo;
+    private TextView textTempUnit;
     //Image views
     private ImageView imgPollSmallCircle;
     private ImageView imgPollCircle;
@@ -43,12 +45,14 @@ public class DataFragment extends Fragment
     //Layouts
     private FrameLayout btnConnect;
     private ConstraintLayout mainCircleLayout;
+    private FrameLayout temperatureLayout;
     //Threads
     private RotationThread rotationThread;
     private ToastDrawerAnimation toastDrawerAnimation;
 
     private boolean connectionError = false;
     private MainCircleData mainCircleData = MainCircleData.PM25;
+    private TemperatureMode temperatureMode = TemperatureMode.Celsius;
     private SensorsCollection sensorsCollection;
 
     public DataFragment() {
@@ -59,35 +63,38 @@ public class DataFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_data, container, false);
 
-        textTemp = view.findViewById(R.id.textTemp);
+        //Finding views from layout
 
+        //Text views
+        //Sensors
+        textTemp = view.findViewById(R.id.textTemp);
         textDust = view.findViewById(R.id.textDust);
         textDust2 = view.findViewById(R.id.textDust10);
-
         textUpdate = view.findViewById(R.id.textUpdate);
+        //Toast drawer
+        textInfo = view.findViewById(R.id.text_info);
 
+        //Image views
         imgPollSmallCircle = view.findViewById(R.id.img_pollution_small_circle);
         imgPollCircle = view.findViewById(R.id.img_pollution_circle);
         imgCircle = view.findViewById(R.id.imgCircle);
 
-        textInfo = view.findViewById(R.id.text_info);
+        //Main circle and onClick listener
+        final TextView textPmType = view.findViewById(R.id.textPmType); //PM type
 
-        final TextView textPmType = view.findViewById(R.id.textPmType);
-
-        mainCircleLayout = view.findViewById(R.id.layout_dust);
+        mainCircleLayout = view.findViewById(R.id.layout_dust); //Getting circle layout
         mainCircleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (mainCircleData == MainCircleData.PM25) {
+            public void onClick(View v) { //Adding onClick listener
+                if (mainCircleData == MainCircleData.PM25) { //Changing for PM10 mode
                     mainCircleData = MainCircleData.PM10;
                     textPmType.setText(getResources().getString(R.string.pm10));
                     textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
                     textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
-                }
-
-                else {
+                } else {                                    //Changing for PM25 mode
                     mainCircleData = MainCircleData.PM25;
                     textPmType.setText(getResources().getString(R.string.pm25));
                     textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
@@ -96,15 +103,17 @@ public class DataFragment extends Fragment
             }
         });
 
-
+        //Getting connection image view and toast frame
         final ImageView imageConnection = view.findViewById(R.id.imageConnection);
 
         imgFrame = view.findViewById(R.id.img_frame);
+
+        //Staring toast thread
         toastDrawerAnimation =
                 new ToastDrawerAnimation(getContext(), this, imgFrame);
         toastDrawerAnimation.start();
 
-
+        //OnClick listener for connection type button
         btnConnect = view.findViewById(R.id.btn_connect);
         btnConnect.setOnClickListener(new View.OnClickListener() {
 
@@ -112,7 +121,7 @@ public class DataFragment extends Fragment
 
             @Override
             public void onClick(View v) {
-                if (connectionMode == ConnectionMode.WiFiConnection) {
+                if (connectionMode == ConnectionMode.WiFiConnection) { //Changing for Bluetooth mode
                     imageConnection.setImageDrawable(
                             getResources().getDrawable(R.drawable.ic_bluetooth_white_24dp));
 
@@ -120,7 +129,7 @@ public class DataFragment extends Fragment
                     toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "Bluetooth mode");
 
                     connectionMode = ConnectionMode.BluetoothConnection;
-                } else {
+                } else {                                                //Changing for WiFi mode
                     imageConnection.setImageDrawable(
                             getResources().getDrawable(R.drawable.ic_wifi_white_24dp));
 
@@ -133,9 +142,30 @@ public class DataFragment extends Fragment
             }
         });
 
+        //Setting onClick listener for Temperature Layout
+        temperatureLayout = view.findViewById(R.id.layoutTemperature);
+        textTempUnit = view.findViewById(R.id.text_temperature_unit);
+
+        temperatureLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(temperatureMode == TemperatureMode.Celsius){ //Changing for Fahrenheit mode
+                    temperatureMode = TemperatureMode.Fahrenheit;
+                    float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
+                    int value = (int)((temp * 1.8) + 32);
+                    textTemp.setText(String.valueOf(value));
+                    textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
+                } else {                                        //Changing for Celsius mode
+                    temperatureMode = TemperatureMode.Celsius;
+                    textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
+                    textTempUnit.setText(getResources().getString(R.string.celsius_unit));
+                }
+            }
+        });
+
+        //Starting connection with server and getting updates
         ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
         serverConnectionThread.start();
-
 
         return view;
     }
@@ -157,8 +187,17 @@ public class DataFragment extends Fragment
             @Override
             public void run() {
 
-                textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
-                if (mainCircleData == MainCircleData.PM25){
+                if (temperatureMode == TemperatureMode.Celsius) {
+                    textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
+                    textTempUnit.setText(getResources().getString(R.string.celsius_unit));
+                } else {
+                    float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
+                    int value = (int)((temp * 1.8) + 32);
+                    textTemp.setText(String.valueOf(value));
+                    textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
+                }
+
+                if (mainCircleData == MainCircleData.PM25) {
                     textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
                     textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
                 } else {

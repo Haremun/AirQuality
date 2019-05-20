@@ -36,7 +36,7 @@ public class SensorsCollection {
         for(int i = 0; i < sensors.size(); i++){
             Sensor temp = sensors.get(i);
             if(temp.getSensorName().equals(sensorName))
-                return temp.getValue();
+                return temp.getStringValue();
         }
             return null;
     }

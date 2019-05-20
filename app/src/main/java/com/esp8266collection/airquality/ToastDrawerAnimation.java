@@ -55,9 +55,9 @@ public class ToastDrawerAnimation extends Thread {
                         break;
                     }
                     case 2: {
+                        _animationCallback.onToastHide();
                         hide();
                         Thread.sleep(400);
-                        _animationCallback.onToastHide();
                         _animationCallback.onToastEnd();
                         _toastType = -1;
                         break;

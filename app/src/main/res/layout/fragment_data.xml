@@ -22,7 +22,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/dustCircle"
+                android:contentDescription="@string/dust_circle"
                 android:src="@drawable/draw_circle_button" />
 
             <ImageView
@@ -37,7 +37,7 @@
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="20dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                />
+                android:layout_marginEnd="5dp"/>
         </FrameLayout>
 
         <FrameLayout
@@ -67,7 +67,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/dustCircle"
+                android:contentDescription="@string/dust_circle"
                 android:src="@drawable/draw_circle_button" />
 
             <ImageView
@@ -128,7 +128,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/circle"
-                android:contentDescription="@string/dustCircle" />
+                android:contentDescription="@string/dust_circle" />
             <!-- DUST SENSOR VALUE 1 -->
             <TextView
                 android:id="@+id/textPmType"
@@ -156,7 +156,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toRightOf="@id/textDust"
                 app:layout_constraintBottom_toBottomOf="@id/textDust"
-                android:text="@string/dustUnit"
+                android:text="@string/dust_unit"
                 android:textSize="12sp"/>
         </android.support.constraint.ConstraintLayout>
 
@@ -196,7 +196,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/small_circle"
-                android:contentDescription="@string/dustCircle"/>
+                android:contentDescription="@string/dust_circle"/>
             <!-- DUST SENSOR VALUE 2 -->
             <LinearLayout
                 android:id="@+id/layoutDust10"
@@ -213,13 +213,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/dustUnit"
+                    android:text="@string/dust_unit"
                     android:textSize="8sp"/>
             </LinearLayout>
         </FrameLayout>
 
         <!-- TEMPERATURE DATA -->
         <FrameLayout
+            android:id="@+id/layoutTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf=
@@ -233,7 +234,7 @@
                 android:src="@drawable/small_circle"
                 android:scaleY="0.9"
                 android:scaleX="0.9"
-                android:contentDescription="@string/dustCircle"/>
+                android:contentDescription="@string/dust_circle"/>
             <LinearLayout
                 android:id="@+id/layoutTemp"
                 android:layout_width="wrap_content"
@@ -244,13 +245,15 @@
                     android:id="@+id/textTemp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+
                     android:hint="@string/zero_hint"
                     android:textSize="18sp"/>
                 <TextView
+                    android:id="@+id/text_temperature_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
-                    android:text="@string/degrees"/>
+                    android:text="@string/celsius_unit"/>
             </LinearLayout>
         </FrameLayout>
     </android.support.constraint.ConstraintLayout>
