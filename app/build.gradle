@@ -16,7 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -28,4 +32,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //implementation 'com.jakewharton:butterknife:10.0.0'
     //annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

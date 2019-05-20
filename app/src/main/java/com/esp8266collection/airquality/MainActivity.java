@@ -15,8 +15,13 @@ public class MainActivity extends AppCompatActivity {
 
         DataFragment dataFragment = new DataFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, dataFragment);
+        transaction.replace(R.id.fragment_data_container, dataFragment);
         transaction.commit();
+
+        DataChartFragment dataChartFragment = new DataChartFragment();
+        FragmentTransaction transaction2 = getSupportFragmentManager().beginTransaction();
+        transaction2.replace(R.id.fragment_chart_container, dataChartFragment);
+        transaction2.commit();
 
     }
 }
