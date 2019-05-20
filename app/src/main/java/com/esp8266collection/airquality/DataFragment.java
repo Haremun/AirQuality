@@ -44,6 +44,7 @@ public class DataFragment extends Fragment
     private ImageView imgPollSmallCircle;
     private ImageView imgPollCircle;
     private ImageView imgCircle;
+    private ImageView imgDustSmallCircle;
     private ImageView imgFrame;
     //Layouts
     private FrameLayout btnConnect;
@@ -89,6 +90,7 @@ public class DataFragment extends Fragment
         imgPollSmallCircle = view.findViewById(R.id.img_pollution_small_circle);
         imgPollCircle = view.findViewById(R.id.img_pollution_circle);
         imgCircle = view.findViewById(R.id.imgCircle);
+        imgDustSmallCircle = view.findViewById(R.id.small_dust_circle);
 
         //Main circle and onClick listener
         final TextView textPmType = view.findViewById(R.id.textPmType); //PM type
@@ -213,6 +215,9 @@ public class DataFragment extends Fragment
                 @Override
                 public void run() {
 
+                    float dustPercentMainCircle;
+                    float dustPercentSmallCircle;
+
                     if (temperatureMode == TemperatureMode.Celsius) {
                         textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
                         textTempUnit.setText(getResources().getString(R.string.celsius_unit));
@@ -226,13 +231,23 @@ public class DataFragment extends Fragment
                     if (mainCircleData == MainCircleData.PM25) {
                         textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
                         textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+
+                        dustPercentMainCircle =
+                                (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
+                        dustPercentSmallCircle =
+                                (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
                     } else {
                         textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
                         textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+
+                        dustPercentMainCircle =
+                                (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
+                        dustPercentSmallCircle =
+                                (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
                     }
 
-                    float dustPercent = (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.DustSensor25)) / 200) * 100;
-                    imgCircle.setColorFilter(greenToRedColor(dustPercent));
+                    imgCircle.setColorFilter(greenToRedColor(dustPercentMainCircle));
+                    imgDustSmallCircle.setColorFilter(greenToRedColor(dustPercentSmallCircle));
 
                     textUpdate.setText(date);
                     float pollutionPercent =
