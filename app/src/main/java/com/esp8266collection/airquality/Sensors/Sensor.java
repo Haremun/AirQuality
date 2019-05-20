@@ -1,4 +1,4 @@
-package com.esp8266collection.airquality;
+package com.esp8266collection.airquality.Sensors;
 
 import android.support.v4.math.MathUtils;
 import android.util.Log;

@@ -2,6 +2,7 @@ package com.esp8266collection.airquality;
 
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
 import com.esp8266collection.airquality.Enums.SensorName;
+import com.esp8266collection.airquality.Sensors.SensorsCollection;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

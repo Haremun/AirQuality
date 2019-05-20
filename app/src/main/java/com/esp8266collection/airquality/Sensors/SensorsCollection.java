@@ -1,4 +1,4 @@
-package com.esp8266collection.airquality;
+package com.esp8266collection.airquality.Sensors;
 
 import com.esp8266collection.airquality.Enums.SensorName;
 

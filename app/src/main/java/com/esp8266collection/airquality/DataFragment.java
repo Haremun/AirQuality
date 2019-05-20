@@ -20,6 +20,7 @@ import com.esp8266collection.airquality.Enums.ConnectionMode;
 import com.esp8266collection.airquality.Enums.MainCircleData;
 import com.esp8266collection.airquality.Enums.SensorName;
 import com.esp8266collection.airquality.Enums.TemperatureMode;
+import com.esp8266collection.airquality.Sensors.SensorsCollection;
 
 import java.util.Objects;
 
