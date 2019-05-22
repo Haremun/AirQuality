@@ -17,16 +17,12 @@ public class ServerConnectionThread extends Thread {
 
     private UpdateCallback updateCallback;
     private boolean run = true;
-    private SensorsCollection sensorsCollection;
+    private DataParser dataParser;
 
     ServerConnectionThread(UpdateCallback updateCallback) {
         this.updateCallback = updateCallback;
-        this.sensorsCollection = new SensorsCollection();
 
-        sensorsCollection.addSensor(SensorName.TemperatureSensor);
-        sensorsCollection.addSensor(SensorName.AirQSensor);
-        sensorsCollection.addSensor(SensorName.DustSensor25);
-        sensorsCollection.addSensor(SensorName.DustSensor10);
+        this.dataParser = new DataParser();
     }
 
     @Override
@@ -43,25 +39,15 @@ public class ServerConnectionThread extends Thread {
                     for (String line; (line = r.readLine()) != null; ) {
                         total.append(line).append('\n');
                     }
-                    String string = total.toString();
-                    char symbol = '%';
-                    int index = string.indexOf(symbol);
-                    String data = string.substring(0, index);
 
-                    String[] parts = data.split("&");
+                    SensorsCollection sensorsCollection = dataParser.parseString(total.toString());
 
-                    sensorsCollection.updateSensor(SensorName.TemperatureSensor, parts[0]);
-                    sensorsCollection.getSensor(SensorName.TemperatureSensor).roundToUnits();
-                    sensorsCollection.updateSensor(SensorName.AirQSensor, parts[1]);
-                    sensorsCollection.updateSensor(SensorName.DustSensor25, parts[2]);
-                    sensorsCollection.updateSensor(SensorName.DustSensor10, parts[3]);
+                    updateCallback.Update(sensorsCollection, dataParser.getLastDate());
 
-                    updateCallback.Update(sensorsCollection, parts[4]);
                 } else {
                     updateCallback.onConnectionError();
                 }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

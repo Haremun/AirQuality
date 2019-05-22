@@ -42,6 +42,9 @@ public class DataChartFragment extends Fragment implements DatabaseCallback {
 
         chart = view.findViewById(R.id.chart);
 
+        chart.setDescription(null);
+        chart.setNoDataText("No data");
+
         Legend legend = chart.getLegend();
         legend.setForm(Legend.LegendForm.CIRCLE);
 

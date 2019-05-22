@@ -1,6 +1,7 @@
 package com.esp8266collection.airquality;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.esp8266collection.airquality.Callbacks.AnimationCallback;
+import com.esp8266collection.airquality.Callbacks.BluetoothCallback;
 import com.esp8266collection.airquality.Callbacks.RotationCallback;
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
 import com.esp8266collection.airquality.Database.DatabaseFunctions;
@@ -31,7 +33,7 @@ import java.util.Objects;
  * A simple {@link Fragment} subclass.
  */
 public class DataFragment extends Fragment
-        implements UpdateCallback, RotationCallback, AnimationCallback {
+        implements UpdateCallback, RotationCallback, AnimationCallback, BluetoothCallback {
 
     //Text views
     private TextView textTemp;
@@ -142,13 +144,14 @@ public class DataFragment extends Fragment
 
         //OnClick listener for connection type button
         btnConnect = view.findViewById(R.id.btn_connect);
+        final Context context = getContext();
         btnConnect.setOnClickListener(new View.OnClickListener() {
 
             private ConnectionMode connectionMode = ConnectionMode.WiFiConnection;
 
             @Override
             public void onClick(View v) {
-                if (connectionMode == ConnectionMode.WiFiConnection) { //Changing for Bluetooth mode
+                if (connectionMode == ConnectionMode.WiFiConnection) { //Changing to Bluetooth mode
                     imageConnection.setImageDrawable(
                             getResources().getDrawable(R.drawable.ic_bluetooth_white_24dp));
 
@@ -156,7 +159,12 @@ public class DataFragment extends Fragment
                     toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "Bluetooth mode");
 
                     connectionMode = ConnectionMode.BluetoothConnection;
-                } else {                                                //Changing for WiFi mode
+
+                    BluetoothConnectionThread bluetoothConnectionThread =
+                            new BluetoothConnectionThread(context, DataFragment.this);
+                    bluetoothConnectionThread.start();
+
+                } else {                                                //Changing to WiFi mode
                     imageConnection.setImageDrawable(
                             getResources().getDrawable(R.drawable.ic_wifi_white_24dp));
 
@@ -176,10 +184,10 @@ public class DataFragment extends Fragment
         temperatureLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(temperatureMode == TemperatureMode.Celsius){ //Changing for Fahrenheit mode
+                if (temperatureMode == TemperatureMode.Celsius) { //Changing for Fahrenheit mode
                     temperatureMode = TemperatureMode.Fahrenheit;
                     float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
-                    int value = (int)((temp * 1.8) + 32);
+                    int value = (int) ((temp * 1.8) + 32);
                     textTemp.setText(String.valueOf(value));
                     textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
                 } else {                                        //Changing for Celsius mode
@@ -197,6 +205,7 @@ public class DataFragment extends Fragment
         ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
         serverConnectionThread.start();
 
+
         return view;
     }
 
@@ -213,17 +222,17 @@ public class DataFragment extends Fragment
 
         this.sensorsCollection = sensorsCollection;
 
-        if (!actualUpdateDate.equals(date)){
+        if (!actualUpdateDate.equals(date)) {
 
             actualUpdateDate = date;
 
             //Adding new data to local database
             DatabaseFunctions databaseFunctions = new DatabaseFunctions(helper);
-            databaseFunctions.addToDatabase((int)sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue(),
-                    (int)sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue());
+            databaseFunctions.addToDatabase((int) sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue(),
+                    (int) sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue());
 
             //Update chart
-            if (dataChartFragment != null){
+            if (dataChartFragment != null) {
                 dataChartFragment.updateChart();
             }
 
@@ -240,7 +249,7 @@ public class DataFragment extends Fragment
                         textTempUnit.setText(getResources().getString(R.string.celsius_unit));
                     } else {
                         float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
-                        int value = (int)((temp * 1.8) + 32);
+                        int value = (int) ((temp * 1.8) + 32);
                         textTemp.setText(String.valueOf(value));
                         textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
                     }
@@ -278,7 +287,6 @@ public class DataFragment extends Fragment
                 }
             });
         }
-
 
 
     }
@@ -360,5 +368,10 @@ public class DataFragment extends Fragment
                 btnConnect.setClickable(true);
             }
         });
+    }
+
+    @Override
+    public void onBluetoothConnect(BluetoothManagementThread bluetoothManagementThread) {
+        toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "Bluetooth connected");
     }
 }
