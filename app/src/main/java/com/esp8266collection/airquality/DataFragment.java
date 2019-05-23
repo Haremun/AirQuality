@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import com.esp8266collection.airquality.Enums.SensorName;
 import com.esp8266collection.airquality.Enums.TemperatureMode;
 import com.esp8266collection.airquality.Sensors.SensorsCollection;
 
+import java.util.Calendar;
 import java.util.Objects;
 
 
@@ -59,6 +61,7 @@ public class DataFragment extends Fragment
     private ToastDrawerAnimation toastDrawerAnimation;
 
     private boolean connectionError = false;
+    private boolean firstUpdate = true;
     private MainCircleData mainCircleData = MainCircleData.PM25;
     private TemperatureMode temperatureMode = TemperatureMode.Celsius;
     private SensorsCollection sensorsCollection;
@@ -66,7 +69,11 @@ public class DataFragment extends Fragment
     private SQLiteHelper helper;
     private DataChartFragment dataChartFragment;
 
-    private String actualUpdateDate = "";
+    private UpdateData mUpdateData;
+    private Calendar actualUpdateDate;
+
+    private BluetoothManagementThread bluetoothManagementThread;
+    private GetLastUpdateFromServer getLastUpdateFromServer;
 
     public DataFragment() {
         // Required empty public constructor
@@ -98,6 +105,7 @@ public class DataFragment extends Fragment
 
         //Main circle and onClick listener
         final TextView textPmType = view.findViewById(R.id.textPmType); //PM type
+
 
         mainCircleLayout = view.findViewById(R.id.layout_dust); //Getting circle layout
         mainCircleLayout.setOnClickListener(new View.OnClickListener() {
@@ -134,6 +142,7 @@ public class DataFragment extends Fragment
             }
         });
 
+
         //Getting connection image view and toast frame
         final ImageView imageConnection = view.findViewById(R.id.imageConnection);
 
@@ -162,6 +171,8 @@ public class DataFragment extends Fragment
 
                     connectionMode = ConnectionMode.BluetoothConnection;
 
+                    getLastUpdateFromServer.setRun(false);
+
                     BluetoothConnectionThread bluetoothConnectionThread =
                             new BluetoothConnectionThread(context, DataFragment.this);
                     bluetoothConnectionThread.start();
@@ -174,6 +185,11 @@ public class DataFragment extends Fragment
                     toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "WiFi mode");
 
                     connectionMode = ConnectionMode.WiFiConnection;
+
+                    if (bluetoothManagementThread != null)
+                        bluetoothManagementThread.closeConnection();
+
+                    getLastUpdateFromServer.setRun(true);
                 }
 
             }
@@ -203,16 +219,30 @@ public class DataFragment extends Fragment
         //Creating new sqlite helper
         helper = new SQLiteHelper(getContext());
 
+        DatabaseFunctions functions = new DatabaseFunctions(helper);
+
+        mUpdateData = functions.getLastUpdate();
+
+        if (mUpdateData != null) {
+            actualUpdateDate = mUpdateData.getCalendar();
+            Update(mUpdateData);
+        } else
+            firstUpdate = false;
+
+
         //Starting connection with server and getting updates
-        //ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
-        //serverConnectionThread.start();
+        getLastUpdateFromServer = new GetLastUpdateFromServer(this);
+        getLastUpdateFromServer.start();
 
 
         return view;
     }
 
     @Override
-    public void Update(final SensorsCollection sensorsCollection, final String date) {
+    public void Update(UpdateData updateData) {
+
+        final Calendar calendar = updateData.getCalendar();
+        final SensorsCollection sensorsCollection = updateData.getSensorsCollection();
 
         if (connectionError) {
 
@@ -224,18 +254,35 @@ public class DataFragment extends Fragment
 
         this.sensorsCollection = sensorsCollection;
 
-        if (!actualUpdateDate.equals(date) || date.equals("111")) {
+        if (mUpdateData == null) {
+            actualUpdateDate = Calendar.getInstance();
+            actualUpdateDate.setTimeInMillis(0);
+            Log.i("Test", "NULL");
+        }
 
-            actualUpdateDate = date;
 
-            //Adding new data to local database
-            DatabaseFunctions databaseFunctions = new DatabaseFunctions(helper);
-            databaseFunctions.addToDatabase((int) sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue(),
-                    (int) sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue());
+        if (calendar.compareTo(actualUpdateDate) > 0 || firstUpdate) {
 
-            //Update chart
-            if (dataChartFragment != null) {
-                dataChartFragment.updateChart();
+            Log.i("Test", calendar.getTime().toString());
+            Log.i("Test", actualUpdateDate.getTime().toString());
+            actualUpdateDate = calendar;
+            mUpdateData = updateData;
+            if (!firstUpdate) {
+                //Adding new data to local database
+                DatabaseFunctions databaseFunctions = new DatabaseFunctions(helper);
+                databaseFunctions.addToDatabase(
+                        (int) sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue(),
+                        (int) sensorsCollection.getSensor(SensorName.AirQSensor).getSensorValue(),
+                        (int) sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue(),
+                        (int) sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue(),
+                        calendar.getTimeInMillis());
+
+                //Update chart
+                if (dataChartFragment != null) {
+                    dataChartFragment.updateChart();
+                }
+            } else {
+                firstUpdate = false;
             }
 
             //Update views with new data
@@ -277,7 +324,9 @@ public class DataFragment extends Fragment
                     imgCircle.setColorFilter(greenToRedColor(dustPercentMainCircle));
                     imgDustSmallCircle.setColorFilter(greenToRedColor(dustPercentSmallCircle));
 
-                    textUpdate.setText(date);
+                    textUpdate.setText(calendar.getTime().toString());
+
+
                     float pollutionPercent =
                             (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.AirQSensor)) / 255) * 100;
                     float angle = (pollutionPercent * 305) / 100;
@@ -375,5 +424,6 @@ public class DataFragment extends Fragment
     @Override
     public void onBluetoothConnect(BluetoothManagementThread bluetoothManagementThread) {
         toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "Bluetooth connected");
+        this.bluetoothManagementThread = bluetoothManagementThread;
     }
 }

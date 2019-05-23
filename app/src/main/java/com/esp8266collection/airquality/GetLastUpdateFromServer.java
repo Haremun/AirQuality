@@ -13,13 +13,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class ServerConnectionThread extends Thread {
+public class GetLastUpdateFromServer extends Thread {
 
     private UpdateCallback updateCallback;
     private boolean run = true;
     private DataParser dataParser;
 
-    ServerConnectionThread(UpdateCallback updateCallback) {
+    GetLastUpdateFromServer(UpdateCallback updateCallback) {
         this.updateCallback = updateCallback;
 
         this.dataParser = new DataParser();
@@ -43,7 +43,7 @@ public class ServerConnectionThread extends Thread {
 
                         SensorsCollection sensorsCollection = dataParser.parseString(total.toString());
 
-                        updateCallback.Update(sensorsCollection, dataParser.getLastDate());
+                        updateCallback.Update(new UpdateData(sensorsCollection, dataParser.getCalendar()));
 
                     } else {
                         updateCallback.onConnectionError();

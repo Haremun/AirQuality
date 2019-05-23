@@ -12,6 +12,13 @@ public class SensorsCollection {
         sensors = new LinkedList<>();
     }
 
+    public void initializeSensors(){
+        addSensor(SensorName.TemperatureSensor);
+        addSensor(SensorName.AirQSensor);
+        addSensor(SensorName.DustSensor25);
+        addSensor(SensorName.DustSensor10);
+    }
+
     public void addSensor(SensorName sensorName) {
         sensors.add(new Sensor(sensorName));
     }

@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.esp8266collection.airquality.Callbacks.DatabaseCallback;
-import com.esp8266collection.airquality.Database.LoadFromDatabaseTask;
+import com.esp8266collection.airquality.Database.LoadDustValuesTask;
 import com.esp8266collection.airquality.Database.SQLiteHelper;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -56,7 +56,7 @@ public class DataChartFragment extends Fragment implements DatabaseCallback {
 
     public void updateChart(){
         SQLiteHelper helper = new SQLiteHelper(getContext());
-        LoadFromDatabaseTask task = new LoadFromDatabaseTask(helper, this);
+        LoadDustValuesTask task = new LoadDustValuesTask(helper, this);
         task.execute();
     }
 

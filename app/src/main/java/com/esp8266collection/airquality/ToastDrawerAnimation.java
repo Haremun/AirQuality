@@ -16,9 +16,8 @@ public class ToastDrawerAnimation extends Thread {
     private ImageView _imageView;
     private boolean _animationDone;
 
-    private int _toastType = -1;
     private List<ToastMessage> toastMessages;
-    private String _toastText;
+    private int counter = 0;
 
     private AnimationCallback _animationCallback;
 
@@ -39,8 +38,8 @@ public class ToastDrawerAnimation extends Thread {
     public void run() {
         while (!_animationDone) {
             try {
-                for(int i = 0; i < toastMessages.size(); i++){
-                    ToastMessage toastMessage = toastMessages.get(i);
+                while(counter < toastMessages.size()){
+                    ToastMessage toastMessage = toastMessages.get(counter);
                     switch (toastMessage.getToastType()) {
                         case 0: {
                             show();
@@ -58,7 +57,6 @@ public class ToastDrawerAnimation extends Thread {
                             Thread.sleep(400);
                             _animationCallback.onToastShow(toastMessage.getToastMessage());
                             _animationCallback.onToastEnd();
-                            _toastType = -1;
                             break;
                         }
                         case 2: {
@@ -66,11 +64,11 @@ public class ToastDrawerAnimation extends Thread {
                             hide();
                             Thread.sleep(400);
                             _animationCallback.onToastEnd();
-                            _toastType = -1;
                             break;
                         }
                     }
-                    toastMessages.remove(toastMessage);
+                    counter++;
+                    //toastMessages.remove(toastMessage);
                     Thread.sleep(50);
                 }
 

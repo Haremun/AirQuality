@@ -10,14 +10,14 @@ import com.esp8266collection.airquality.DustValues;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoadFromDatabaseTask extends AsyncTask<Void, Void, Void> {
+public class LoadDustValuesTask extends AsyncTask<Void, Void, Void> {
 
     private DatabaseCallback databaseCallback;
     private List<DustValues> dustValuesList;
     private SQLiteHelper helper;
 
 
-    public LoadFromDatabaseTask(SQLiteHelper helper, DatabaseCallback databaseCallback) {
+    public LoadDustValuesTask(SQLiteHelper helper, DatabaseCallback databaseCallback) {
         this.helper = helper;
         this.databaseCallback = databaseCallback;
 
@@ -33,7 +33,7 @@ public class LoadFromDatabaseTask extends AsyncTask<Void, Void, Void> {
 
         while (cursor.moveToNext()) {
             DustValues dustValues =
-                    new DustValues(cursor.getInt(1), cursor.getInt(2));
+                    new DustValues(cursor.getInt(3), cursor.getInt(4));
             dustValuesList.add(dustValues);
         }
         cursor.close();

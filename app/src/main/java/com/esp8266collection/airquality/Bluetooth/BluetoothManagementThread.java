@@ -6,6 +6,7 @@ import android.util.Log;
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
 import com.esp8266collection.airquality.DataParser;
 import com.esp8266collection.airquality.Sensors.SensorsCollection;
+import com.esp8266collection.airquality.UpdateData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,12 +20,14 @@ public class BluetoothManagementThread extends Thread {
     private OutputStream mOutputStream;
     private BufferedReader reader;
     private DataParser dataParser;
+    private BluetoothSocket bluetoothSocket;
 
     private UpdateCallback updateCallback;
 
     public BluetoothManagementThread(BluetoothSocket socket, UpdateCallback updateCallback) {
         Log.i("BluetoothTest", "Connected");
 
+        this.bluetoothSocket = socket;
         this.updateCallback = updateCallback;
         this.dataParser = new DataParser();
 
@@ -36,11 +39,11 @@ public class BluetoothManagementThread extends Thread {
     public void run() {
         try {
             while (true) {
-                String line =  reader.readLine();
+                String line = reader.readLine();
 
                 SensorsCollection sensorsCollection = dataParser.parseString(line);
 
-                updateCallback.Update(sensorsCollection, dataParser.getLastDate());
+                updateCallback.Update(new UpdateData(sensorsCollection, dataParser.getCalendar()));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,7 +51,21 @@ public class BluetoothManagementThread extends Thread {
 
     }
 
-    private void connectAndGetStreams(BluetoothSocket socket){
+    public void closeConnection() {
+
+        if (bluetoothSocket.isConnected())
+            try {
+                mInputStream.close();
+                mOutputStream.flush();
+                mOutputStream.close();
+                bluetoothSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+    }
+
+    private void connectAndGetStreams(BluetoothSocket socket) {
         try {
             socket.connect();
 
