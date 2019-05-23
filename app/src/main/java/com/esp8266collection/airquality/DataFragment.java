@@ -14,6 +14,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.esp8266collection.airquality.Bluetooth.BluetoothConnectionThread;
+import com.esp8266collection.airquality.Bluetooth.BluetoothManagementThread;
 import com.esp8266collection.airquality.Callbacks.AnimationCallback;
 import com.esp8266collection.airquality.Callbacks.BluetoothCallback;
 import com.esp8266collection.airquality.Callbacks.RotationCallback;
@@ -202,8 +204,8 @@ public class DataFragment extends Fragment
         helper = new SQLiteHelper(getContext());
 
         //Starting connection with server and getting updates
-        ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
-        serverConnectionThread.start();
+        //ServerConnectionThread serverConnectionThread = new ServerConnectionThread(this);
+        //serverConnectionThread.start();
 
 
         return view;
@@ -222,7 +224,7 @@ public class DataFragment extends Fragment
 
         this.sensorsCollection = sensorsCollection;
 
-        if (!actualUpdateDate.equals(date)) {
+        if (!actualUpdateDate.equals(date) || date.equals("111")) {
 
             actualUpdateDate = date;
 

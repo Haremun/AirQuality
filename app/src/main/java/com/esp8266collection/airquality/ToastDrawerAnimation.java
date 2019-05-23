@@ -7,6 +7,9 @@ import android.widget.ImageView;
 
 import com.esp8266collection.airquality.Callbacks.AnimationCallback;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ToastDrawerAnimation extends Thread {
 
     private Context _context;
@@ -14,6 +17,7 @@ public class ToastDrawerAnimation extends Thread {
     private boolean _animationDone;
 
     private int _toastType = -1;
+    private List<ToastMessage> toastMessages;
     private String _toastText;
 
     private AnimationCallback _animationCallback;
@@ -27,42 +31,49 @@ public class ToastDrawerAnimation extends Thread {
         this._imageView = imageView;
         this._animationDone = false;
         this._animationCallback = animationCallback;
+
+        toastMessages = new ArrayList<>();
     }
 
     @Override
     public void run() {
         while (!_animationDone) {
             try {
-                switch (_toastType) {
-                    case 0: {
-                        show();
-                        Thread.sleep(400);
-                        _animationCallback.onToastShow(_toastText);
-                        Thread.sleep(1000);
-                        _animationCallback.onToastHide();
-                        hide();
-                        Thread.sleep(400);
-                        _animationCallback.onToastEnd();
-                        _toastType = -1;
-                        break;
+                for(int i = 0; i < toastMessages.size(); i++){
+                    ToastMessage toastMessage = toastMessages.get(i);
+                    switch (toastMessage.getToastType()) {
+                        case 0: {
+                            show();
+                            Thread.sleep(400);
+                            _animationCallback.onToastShow(toastMessage.getToastMessage());
+                            Thread.sleep(1000);
+                            _animationCallback.onToastHide();
+                            hide();
+                            Thread.sleep(400);
+                            _animationCallback.onToastEnd();
+                            break;
+                        }
+                        case 1: {
+                            show();
+                            Thread.sleep(400);
+                            _animationCallback.onToastShow(toastMessage.getToastMessage());
+                            _animationCallback.onToastEnd();
+                            _toastType = -1;
+                            break;
+                        }
+                        case 2: {
+                            _animationCallback.onToastHide();
+                            hide();
+                            Thread.sleep(400);
+                            _animationCallback.onToastEnd();
+                            _toastType = -1;
+                            break;
+                        }
                     }
-                    case 1: {
-                        show();
-                        Thread.sleep(400);
-                        _animationCallback.onToastShow(_toastText);
-                        _animationCallback.onToastEnd();
-                        _toastType = -1;
-                        break;
-                    }
-                    case 2: {
-                        _animationCallback.onToastHide();
-                        hide();
-                        Thread.sleep(400);
-                        _animationCallback.onToastEnd();
-                        _toastType = -1;
-                        break;
-                    }
+                    toastMessages.remove(toastMessage);
+                    Thread.sleep(50);
                 }
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -71,13 +82,11 @@ public class ToastDrawerAnimation extends Thread {
     }
 
     public void startToast(int toastType, String text) {
-        this._toastType = toastType;
-        this._toastText = text;
+        toastMessages.add(new ToastMessage(toastType, text));
     }
 
     public void startToast(int toastType) {
-        this._toastType = toastType;
-        this._toastText = "";
+        toastMessages.add(new ToastMessage(toastType, ""));
     }
 
     private void show() {

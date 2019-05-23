@@ -27,35 +27,38 @@ public class ServerConnectionThread extends Thread {
 
     @Override
     public void run() {
-        while (run) {
-            try {
-                URL url = new URL("http://esp8266collection.keep.pl/json/get_data.php");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        while (true) {
+            if (run) {
+                try {
+                    URL url = new URL("http://esp8266collection.keep.pl/json/get_data.php");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-                if (checkConnection(connection)) {
-                    InputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                    BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder total = new StringBuilder();
-                    for (String line; (line = r.readLine()) != null; ) {
-                        total.append(line).append('\n');
+                    if (checkConnection(connection)) {
+                        InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                        BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+                        StringBuilder total = new StringBuilder();
+                        for (String line; (line = r.readLine()) != null; ) {
+                            total.append(line).append('\n');
+                        }
+
+                        SensorsCollection sensorsCollection = dataParser.parseString(total.toString());
+
+                        updateCallback.Update(sensorsCollection, dataParser.getLastDate());
+
+                    } else {
+                        updateCallback.onConnectionError();
                     }
 
-                    SensorsCollection sensorsCollection = dataParser.parseString(total.toString());
-
-                    updateCallback.Update(sensorsCollection, dataParser.getLastDate());
-
-                } else {
-                    updateCallback.onConnectionError();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
 
 

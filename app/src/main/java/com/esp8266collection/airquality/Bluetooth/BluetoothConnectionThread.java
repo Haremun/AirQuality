@@ -1,15 +1,14 @@
-package com.esp8266collection.airquality;
+package com.esp8266collection.airquality.Bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.util.Log;
 
 import com.esp8266collection.airquality.Callbacks.BluetoothCallback;
+import com.esp8266collection.airquality.Callbacks.UpdateCallback;
+import com.esp8266collection.airquality.DataFragment;
 
 import java.io.IOException;
 import java.util.Set;
@@ -19,13 +18,15 @@ public class BluetoothConnectionThread extends Thread {
 
     private static final String DEVICE_NAME = "HC-05";
 
-    private BluetoothCallback callback;
+    private BluetoothCallback bluetoothCallback;
+    private UpdateCallback updateCallback;
     private Context context;
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothDevice bluetoothDevice;
 
-    public BluetoothConnectionThread(Context context, BluetoothCallback callback) {
-        this.callback = callback;
+    public BluetoothConnectionThread(Context context, DataFragment dataFragment) {
+        this.bluetoothCallback = (BluetoothCallback) dataFragment;
+        this.updateCallback = (UpdateCallback) dataFragment;
         this.context = context;
 
     }
@@ -50,10 +51,10 @@ public class BluetoothConnectionThread extends Thread {
                         UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"));
 
                 if (tmp != null){
-                    BluetoothManagementThread bluetoothManagementThread = new BluetoothManagementThread(tmp);
+                    BluetoothManagementThread bluetoothManagementThread = new BluetoothManagementThread(tmp, updateCallback);
                     bluetoothManagementThread.start();
-                    if(callback != null)
-                        callback.onBluetoothConnect(bluetoothManagementThread);
+                    if(bluetoothCallback != null)
+                        bluetoothCallback.onBluetoothConnect(bluetoothManagementThread);
                 }
 
             } catch (IOException e) {

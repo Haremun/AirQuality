@@ -6,7 +6,7 @@ import com.esp8266collection.airquality.Sensors.SensorsCollection;
 public class DataParser {
 
     private SensorsCollection sensorsCollection;
-    private String lastDate;
+    private String lastDate = "111";
 
     public DataParser() {
         sensorsCollection = new SensorsCollection();
@@ -20,16 +20,19 @@ public class DataParser {
     public SensorsCollection parseString(String string) {
         char symbol = '%';
         int index = string.indexOf(symbol);
-        String data = string.substring(0, index);
 
-        String[] parts = data.split("&");
+        if (index != -1)
+            string = string.substring(0, index);
+
+        String[] parts = string.split("&");
         sensorsCollection.updateSensor(SensorName.TemperatureSensor, parts[0]);
         sensorsCollection.getSensor(SensorName.TemperatureSensor).roundToUnits();
         sensorsCollection.updateSensor(SensorName.AirQSensor, parts[1]);
         sensorsCollection.updateSensor(SensorName.DustSensor25, parts[2]);
         sensorsCollection.updateSensor(SensorName.DustSensor10, parts[3]);
 
-        lastDate = parts[4];
+        if (parts.length > 4)
+            lastDate = parts[4];
 
         return sensorsCollection;
     }
