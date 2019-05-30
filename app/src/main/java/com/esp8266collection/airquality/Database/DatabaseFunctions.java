@@ -5,10 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.esp8266collection.airquality.DataParser;
+import com.esp8266collection.airquality.Enums.SensorName;
 import com.esp8266collection.airquality.Sensors.SensorsCollection;
 import com.esp8266collection.airquality.UpdateData;
-
-import java.util.Calendar;
 
 public class DatabaseFunctions {
 
@@ -18,15 +17,24 @@ public class DatabaseFunctions {
         this.helper = helper;
     }
 
-    public void addToDatabase(int temperature, int airq, int pm25, int pm10, long time) {
+    public void addToDatabase(UpdateData updateData) {
+
+        SensorsCollection collection = updateData.getSensorsCollection();
 
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseStructure.TABLE_NAME_TEMPERATURE, temperature);
-        contentValues.put(DatabaseStructure.TABLE_NAME_AIRQ, airq);
-        contentValues.put(DatabaseStructure.TABLE_NAME_PM_25, pm25);
-        contentValues.put(DatabaseStructure.TABLE_NAME_PM_10, pm10);
-        contentValues.put(DatabaseStructure.TABLE_NAME_TIME, time);
+
+        contentValues.put(DatabaseStructure.TABLE_NAME_TEMPERATURE,
+                collection.getStringSensorValue(SensorName.TemperatureSensor));
+        contentValues.put(DatabaseStructure.TABLE_NAME_AIRQ,
+                collection.getStringSensorValue(SensorName.AirQSensor));
+        contentValues.put(DatabaseStructure.TABLE_NAME_PM_25,
+                collection.getSensorValue(SensorName.DustSensor25));
+        contentValues.put(DatabaseStructure.TABLE_NAME_PM_10,
+                collection.getSensorValue(SensorName.DustSensor10));
+        contentValues.put(DatabaseStructure.TABLE_NAME_BATTERY,
+                collection.getSensorValue(SensorName.BatterySensor));
+        contentValues.put(DatabaseStructure.TABLE_NAME_TIME, updateData.getCalendar().getTimeInMillis());
 
         db.insert(DatabaseStructure.TABLE_NAME, null, contentValues);
     }

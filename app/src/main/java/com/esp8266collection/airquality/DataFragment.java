@@ -46,6 +46,7 @@ public class DataFragment extends Fragment
     private TextView textUpdate;
     private TextView textInfo;
     private TextView textTempUnit;
+    private TextView textBattery;
     //Image views
     private ImageView imgPollSmallCircle;
     private ImageView imgPollCircle;
@@ -94,6 +95,7 @@ public class DataFragment extends Fragment
         textDust = view.findViewById(R.id.textDust);
         textDust2 = view.findViewById(R.id.textDust10);
         textUpdate = view.findViewById(R.id.textUpdate);
+        textBattery = view.findViewById(R.id.text_battery);
         //Toast drawer
         textInfo = view.findViewById(R.id.text_info);
 
@@ -118,8 +120,8 @@ public class DataFragment extends Fragment
                 if (mainCircleData == MainCircleData.PM25) { //Changing for PM10 mode
                     mainCircleData = MainCircleData.PM10;
                     textPmType.setText(getResources().getString(R.string.pm10));
-                    textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
-                    textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                    textDust.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor10));
+                    textDust2.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor25));
 
                     dustPercentMainCircle =
                             (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
@@ -128,8 +130,8 @@ public class DataFragment extends Fragment
                 } else {                                    //Changing for PM25 mode
                     mainCircleData = MainCircleData.PM25;
                     textPmType.setText(getResources().getString(R.string.pm25));
-                    textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
-                    textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                    textDust.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor25));
+                    textDust2.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor10));
 
                     dustPercentMainCircle =
                             (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
@@ -210,7 +212,7 @@ public class DataFragment extends Fragment
                     textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
                 } else {                                        //Changing for Celsius mode
                     temperatureMode = TemperatureMode.Celsius;
-                    textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
+                    textTemp.setText(sensorsCollection.getStringSensorValue(SensorName.TemperatureSensor));
                     textTempUnit.setText(getResources().getString(R.string.celsius_unit));
                 }
             }
@@ -220,6 +222,9 @@ public class DataFragment extends Fragment
         helper = new SQLiteHelper(getContext());
 
         DatabaseFunctions functions = new DatabaseFunctions(helper);
+
+        SynchronizeDataTask task = new SynchronizeDataTask(helper);
+        task.execute();
 
         mUpdateData = functions.getLastUpdate();
 
@@ -270,12 +275,7 @@ public class DataFragment extends Fragment
             if (!firstUpdate) {
                 //Adding new data to local database
                 DatabaseFunctions databaseFunctions = new DatabaseFunctions(helper);
-                databaseFunctions.addToDatabase(
-                        (int) sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue(),
-                        (int) sensorsCollection.getSensor(SensorName.AirQSensor).getSensorValue(),
-                        (int) sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue(),
-                        (int) sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue(),
-                        calendar.getTimeInMillis());
+                databaseFunctions.addToDatabase(updateData);
 
                 //Update chart
                 if (dataChartFragment != null) {
@@ -293,8 +293,18 @@ public class DataFragment extends Fragment
                     float dustPercentMainCircle;
                     float dustPercentSmallCircle;
 
+                    float battery = sensorsCollection.getSensorValue(SensorName.BatterySensor);
+
+                    int batteryPercent = (int) (((battery - 3)/(4.2 - 3)) * 100);
+
+                    String batteryStatus =
+                            sensorsCollection.getStringSensorValue(SensorName.BatterySensor) + "V"
+                                    + ": " + batteryPercent + "%";
+
+                    textBattery.setText(batteryStatus);
+
                     if (temperatureMode == TemperatureMode.Celsius) {
-                        textTemp.setText(sensorsCollection.getSensorValue(SensorName.TemperatureSensor));
+                        textTemp.setText(sensorsCollection.getStringSensorValue(SensorName.TemperatureSensor));
                         textTempUnit.setText(getResources().getString(R.string.celsius_unit));
                     } else {
                         float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
@@ -304,16 +314,16 @@ public class DataFragment extends Fragment
                     }
 
                     if (mainCircleData == MainCircleData.PM25) {
-                        textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
-                        textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
+                        textDust.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor25));
+                        textDust2.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor10));
 
                         dustPercentMainCircle =
                                 (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
                         dustPercentSmallCircle =
                                 (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
                     } else {
-                        textDust.setText(sensorsCollection.getSensorValue(SensorName.DustSensor10));
-                        textDust2.setText(sensorsCollection.getSensorValue(SensorName.DustSensor25));
+                        textDust.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor10));
+                        textDust2.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor25));
 
                         dustPercentMainCircle =
                                 (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
@@ -328,7 +338,7 @@ public class DataFragment extends Fragment
 
 
                     float pollutionPercent =
-                            (Float.parseFloat(sensorsCollection.getSensorValue(SensorName.AirQSensor)) / 255) * 100;
+                            (Float.parseFloat(sensorsCollection.getStringSensorValue(SensorName.AirQSensor)) / 255) * 100;
                     float angle = (pollutionPercent * 305) / 100;
                     imgPollSmallCircle.setRotation(angle);
 

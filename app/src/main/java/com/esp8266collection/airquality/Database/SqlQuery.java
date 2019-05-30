@@ -8,6 +8,7 @@ class SqlQuery {
                 DatabaseStructure.TABLE_NAME_AIRQ + " INTEGER," +
                 DatabaseStructure.TABLE_NAME_PM_25 + " INTEGER," +
                 DatabaseStructure.TABLE_NAME_PM_10 + " INTEGER," +
+                DatabaseStructure.TABLE_NAME_BATTERY + " INTEGER," +
                 DatabaseStructure.TABLE_NAME_TIME + " INTEGER);";
     }
 

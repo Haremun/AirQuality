@@ -7,4 +7,5 @@ class DatabaseStructure {
     public static final String TABLE_NAME_TIME = "time";
     public static final String TABLE_NAME_AIRQ = "airq";
     public static final String TABLE_NAME_TEMPERATURE = "temperature";
+    public static final String TABLE_NAME_BATTERY = "battery";
 }

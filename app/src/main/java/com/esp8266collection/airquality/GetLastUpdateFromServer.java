@@ -1,7 +1,6 @@
 package com.esp8266collection.airquality;
 
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
-import com.esp8266collection.airquality.Enums.SensorName;
 import com.esp8266collection.airquality.Sensors.SensorsCollection;
 
 import java.io.BufferedInputStream;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class GetLastUpdateFromServer extends Thread {
@@ -29,28 +27,15 @@ public class GetLastUpdateFromServer extends Thread {
     public void run() {
         while (true) {
             if (run) {
-                try {
-                    URL url = new URL("http://esp8266collection.keep.pl/json/get_data.php");
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                ServerConnection serverConnection = new ServerConnection();
+                serverConnection.connect("http://esp8266collection.keep.pl/json/get_data.php");
+                if (serverConnection.isConnected()){
+                    String response = serverConnection.getResponse();
+                    SensorsCollection sensorsCollection = dataParser.parseString(response);
 
-                    if (checkConnection(connection)) {
-                        InputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                        BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-                        StringBuilder total = new StringBuilder();
-                        for (String line; (line = r.readLine()) != null; ) {
-                            total.append(line).append('\n');
-                        }
+                    updateCallback.Update(new UpdateData(sensorsCollection, dataParser.getCalendar()));
 
-                        SensorsCollection sensorsCollection = dataParser.parseString(total.toString());
-
-                        updateCallback.Update(new UpdateData(sensorsCollection, dataParser.getCalendar()));
-
-                    } else {
-                        updateCallback.onConnectionError();
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    serverConnection.close();
                 }
                 try {
                     Thread.sleep(5000);

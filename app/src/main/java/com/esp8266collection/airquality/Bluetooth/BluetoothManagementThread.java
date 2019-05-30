@@ -39,11 +39,15 @@ public class BluetoothManagementThread extends Thread {
     public void run() {
         try {
             while (true) {
-                String line = reader.readLine();
+                if (bluetoothSocket.isConnected()){
+                    String line = reader.readLine();
 
-                SensorsCollection sensorsCollection = dataParser.parseString(line);
+                    Log.i("BluetoothTest", line);
 
-                updateCallback.Update(new UpdateData(sensorsCollection, dataParser.getCalendar()));
+                    SensorsCollection sensorsCollection = dataParser.parseString(line);
+
+                    updateCallback.Update(new UpdateData(sensorsCollection, dataParser.getCalendar()));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
