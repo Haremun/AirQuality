@@ -32,6 +32,7 @@
     <string name="cancel">Cancel</string>
     <string name="title_set_network">Set network</string>
 
+
     <string-array name="time_intervals">
         <item>30 sec</item>
         <item>1 min</item>

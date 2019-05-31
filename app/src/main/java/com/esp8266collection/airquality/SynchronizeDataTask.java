@@ -99,7 +99,6 @@ public class SynchronizeDataTask extends AsyncTask<Void, Void, Void> {
         }
         for (int i = UPDATES_LIMIT - 1; i >= 0; i--) {
             UpdateData data = result[i];
-            Log.i("Result_test", data.getSensorsCollection().getStringSensorValue(SensorName.DustSensor25));
             if (data != null)
                 databaseFunctions.addToDatabase(data);
         }

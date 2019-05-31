@@ -329,7 +329,8 @@ public class DataFragment extends Fragment
                                         Objects.requireNonNull(getContext()).getPackageName()));
 
                         imgBatteryStatus.setImageDrawable(drawable);
-
+                        if (batteryPercent < 0)
+                            batteryPercent = 0;
                         String batteryStatus = batteryPercent + "%";
 
                         textBattery.setText(batteryStatus);

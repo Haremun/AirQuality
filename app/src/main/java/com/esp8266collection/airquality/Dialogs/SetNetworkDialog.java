@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
@@ -27,7 +28,7 @@ public class SetNetworkDialog extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        LayoutInflater inflater = Objects.requireNonNull(getActivity()).getLayoutInflater();
+        final LayoutInflater inflater = Objects.requireNonNull(getActivity()).getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_set_network, null);
         final EditText networkName = view.findViewById(R.id.edit_network_name);
         final EditText password = view.findViewById(R.id.edit_password);
@@ -39,9 +40,17 @@ public class SetNetworkDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Fragment targetFragment = dialogFragment.getTargetFragment();
-                        if (targetFragment != null)
-                            targetFragment.onActivityResult(
-                                    targetFragment.getTargetRequestCode(), Activity.RESULT_OK, null);
+                        if (targetFragment != null){
+                            if (targetFragment.getActivity() != null){
+                                Intent intent = targetFragment.getActivity().getIntent();
+
+                                intent.putExtra("Network", networkName.getText().toString());
+                                intent.putExtra("Password", password.getText().toString());
+                                targetFragment.onActivityResult(
+                                        targetFragment.getTargetRequestCode(), Activity.RESULT_OK, intent);
+                            }
+                        }
+
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
