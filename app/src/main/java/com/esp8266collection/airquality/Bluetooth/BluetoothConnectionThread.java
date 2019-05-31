@@ -40,6 +40,7 @@ public class BluetoothConnectionThread extends Thread {
     public void run() {
 
         findDevice();
+        boolean connected = false;
 
         if(bluetoothDevice != null){
             Log.i("BluetoothTest", "Connecting...");
@@ -50,12 +51,12 @@ public class BluetoothConnectionThread extends Thread {
                 tmp = bluetoothDevice.createRfcommSocketToServiceRecord(
                         UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"));
 
-                if (tmp != null){
-                    BluetoothManagementThread bluetoothManagementThread = new BluetoothManagementThread(tmp, updateCallback);
-                    bluetoothManagementThread.start();
-                    if(bluetoothCallback != null)
-                        bluetoothCallback.onBluetoothConnect(bluetoothManagementThread);
-                }
+
+
+                BluetoothManagementThread bluetoothManagementThread = new BluetoothManagementThread(tmp, updateCallback);
+                bluetoothManagementThread.start();
+                if(bluetoothCallback != null)
+                    bluetoothCallback.onBluetoothConnect(bluetoothManagementThread);
 
             } catch (IOException e) {
                 Log.i("BluetoothTest", "Socket's create() method failed", e);

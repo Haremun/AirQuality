@@ -20,4 +20,6 @@
     <string name="desc_pollution_small_circle">pollution small circle</string>
     <string name="pm25">PM 2,5:</string>
     <string name="pm10">PM 10:</string>
+    <string name="battery_status">battery status</string>
+    <string name="sample_100">100%</string>
 </resources>

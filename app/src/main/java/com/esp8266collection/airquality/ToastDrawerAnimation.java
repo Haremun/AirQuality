@@ -3,6 +3,7 @@ package com.esp8266collection.airquality;
 import android.content.Context;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.esp8266collection.airquality.Callbacks.AnimationCallback;
@@ -39,6 +40,7 @@ public class ToastDrawerAnimation extends Thread {
         while (!_animationDone) {
             try {
                 while(counter < toastMessages.size()){
+                    Log.i("Animation_test", counter + " " + toastMessages.size());
                     ToastMessage toastMessage = toastMessages.get(counter);
                     switch (toastMessage.getToastType()) {
                         case 0: {
@@ -68,7 +70,6 @@ public class ToastDrawerAnimation extends Thread {
                         }
                     }
                     counter++;
-                    //toastMessages.remove(toastMessage);
                     Thread.sleep(50);
                 }
 
@@ -89,7 +90,7 @@ public class ToastDrawerAnimation extends Thread {
 
     private void show() {
         Drawable drawable;
-        drawable = _context.getResources().getDrawable(R.drawable.show_information_frame);
+        drawable = _context.getDrawable(R.drawable.show_information_frame);
         _imageView.setImageDrawable(drawable);
         AnimatedVectorDrawable animatedVectorDrawable = (AnimatedVectorDrawable) _imageView.getDrawable();
         animatedVectorDrawable.start();
@@ -97,7 +98,7 @@ public class ToastDrawerAnimation extends Thread {
 
     private void hide() {
         Drawable drawable;
-        drawable = _context.getResources().getDrawable(R.drawable.hide_information_frame);
+        drawable = _context.getDrawable(R.drawable.hide_information_frame);
         _imageView.setImageDrawable(drawable);
         AnimatedVectorDrawable animatedVectorDrawable = (AnimatedVectorDrawable) _imageView.getDrawable();
         animatedVectorDrawable.start();

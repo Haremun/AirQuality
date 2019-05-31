@@ -3,6 +3,7 @@ package com.esp8266collection.airquality;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -53,6 +54,7 @@ public class DataFragment extends Fragment
     private ImageView imgCircle;
     private ImageView imgDustSmallCircle;
     private ImageView imgFrame;
+    private ImageView imgBatteryStatus;
     //Layouts
     private FrameLayout btnConnect;
     private ConstraintLayout mainCircleLayout;
@@ -104,6 +106,7 @@ public class DataFragment extends Fragment
         imgPollCircle = view.findViewById(R.id.img_pollution_circle);
         imgCircle = view.findViewById(R.id.imgCircle);
         imgDustSmallCircle = view.findViewById(R.id.small_dust_circle);
+        imgBatteryStatus = view.findViewById(R.id.img_battery_status);
 
         //Main circle and onClick listener
         final TextView textPmType = view.findViewById(R.id.textPmType); //PM type
@@ -284,69 +287,90 @@ public class DataFragment extends Fragment
             } else {
                 firstUpdate = false;
             }
+            try {
+//Update views with new data ************************************************************************
+                Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
 
-            //Update views with new data
-            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+//Battery update------------------------------------------------------------------------------------
+                        float battery = sensorsCollection.getSensorValue(SensorName.BatterySensor);
 
-                    float dustPercentMainCircle;
-                    float dustPercentSmallCircle;
+                        int batteryPercent = (int) (((battery - 3) / (4.2 - 3)) * 100);
+                        String batteryLevel;
+                        if (batteryPercent > 90)
+                            batteryLevel = "100";
+                        else if (batteryPercent > 60)
+                            batteryLevel = "90";
+                        else if (batteryPercent > 50)
+                            batteryLevel = "60";
+                        else if (batteryPercent > 30)
+                            batteryLevel = "50";
+                        else if (batteryPercent > 20)
+                            batteryLevel = "30";
+                        else
+                            batteryLevel = "20";
+                        String drawableName = "ic_battery_" + batteryLevel;
+                        Drawable drawable = getResources().getDrawable(
+                                getResources().getIdentifier(drawableName, "drawable",
+                                        Objects.requireNonNull(getContext()).getPackageName()));
 
-                    float battery = sensorsCollection.getSensorValue(SensorName.BatterySensor);
+                        imgBatteryStatus.setImageDrawable(drawable);
 
-                    int batteryPercent = (int) (((battery - 3)/(4.2 - 3)) * 100);
+                        String batteryStatus = batteryPercent + "%";
 
-                    String batteryStatus =
-                            sensorsCollection.getStringSensorValue(SensorName.BatterySensor) + "V"
-                                    + ": " + batteryPercent + "%";
+                        textBattery.setText(batteryStatus);
+//Temperature update--------------------------------------------------------------------------------
+                        if (temperatureMode == TemperatureMode.Celsius) {
+                            textTemp.setText(sensorsCollection.getStringSensorValue(SensorName.TemperatureSensor));
+                            textTempUnit.setText(getResources().getString(R.string.celsius_unit));
+                        } else {
+                            float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
+                            int value = (int) ((temp * 1.8) + 32);
+                            textTemp.setText(String.valueOf(value));
+                            textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
+                        }
+//Dust update---------------------------------------------------------------------------------------
+                        float dustPercentMainCircle;
+                        float dustPercentSmallCircle;
+                        if (mainCircleData == MainCircleData.PM25) {
+                            textDust.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor25));
+                            textDust2.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor10));
 
-                    textBattery.setText(batteryStatus);
+                            dustPercentMainCircle =
+                                    (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
+                            dustPercentSmallCircle =
+                                    (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
+                        } else {
+                            textDust.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor10));
+                            textDust2.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor25));
 
-                    if (temperatureMode == TemperatureMode.Celsius) {
-                        textTemp.setText(sensorsCollection.getStringSensorValue(SensorName.TemperatureSensor));
-                        textTempUnit.setText(getResources().getString(R.string.celsius_unit));
-                    } else {
-                        float temp = sensorsCollection.getSensor(SensorName.TemperatureSensor).getSensorValue();
-                        int value = (int) ((temp * 1.8) + 32);
-                        textTemp.setText(String.valueOf(value));
-                        textTempUnit.setText(getResources().getString(R.string.fahrenheit_unit));
+                            dustPercentMainCircle =
+                                    (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
+                            dustPercentSmallCircle =
+                                    (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
+                        }
+//Colors update-------------------------------------------------------------------------------------
+                        imgCircle.setColorFilter(greenToRedColor(dustPercentMainCircle));
+                        imgDustSmallCircle.setColorFilter(greenToRedColor(dustPercentSmallCircle));
+
+                        textUpdate.setText(calendar.getTime().toString());
+
+//Sliding pollution circle update-------------------------------------------------------------------
+                        float pollutionPercent =
+                                (Float.parseFloat(sensorsCollection.getStringSensorValue(SensorName.AirQSensor)) / 255) * 100;
+                        float angle = (pollutionPercent * 305) / 100;
+                        imgPollSmallCircle.setRotation(angle);
+
+
+                        imgPollCircle.setColorFilter(greenToRedColor(pollutionPercent));
+
                     }
+                });
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
 
-                    if (mainCircleData == MainCircleData.PM25) {
-                        textDust.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor25));
-                        textDust2.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor10));
-
-                        dustPercentMainCircle =
-                                (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
-                        dustPercentSmallCircle =
-                                (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
-                    } else {
-                        textDust.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor10));
-                        textDust2.setText(sensorsCollection.getStringSensorValue(SensorName.DustSensor25));
-
-                        dustPercentMainCircle =
-                                (sensorsCollection.getSensor(SensorName.DustSensor10).getSensorValue() / 200) * 100;
-                        dustPercentSmallCircle =
-                                (sensorsCollection.getSensor(SensorName.DustSensor25).getSensorValue() / 200) * 100;
-                    }
-
-                    imgCircle.setColorFilter(greenToRedColor(dustPercentMainCircle));
-                    imgDustSmallCircle.setColorFilter(greenToRedColor(dustPercentSmallCircle));
-
-                    textUpdate.setText(calendar.getTime().toString());
-
-
-                    float pollutionPercent =
-                            (Float.parseFloat(sensorsCollection.getStringSensorValue(SensorName.AirQSensor)) / 255) * 100;
-                    float angle = (pollutionPercent * 305) / 100;
-                    imgPollSmallCircle.setRotation(angle);
-
-
-                    imgPollCircle.setColorFilter(greenToRedColor(pollutionPercent));
-
-                }
-            });
         }
 
 

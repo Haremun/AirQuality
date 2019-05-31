@@ -12,7 +12,10 @@ import com.esp8266collection.airquality.Callbacks.DatabaseCallback;
 import com.esp8266collection.airquality.Database.LoadDustValuesTask;
 import com.esp8266collection.airquality.Database.SQLiteHelper;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -44,11 +47,30 @@ public class DataChartFragment extends Fragment implements DatabaseCallback {
 
         chart.setDescription(null);
         chart.setNoDataText("No data");
+        chart.setDrawGridBackground(false);
+
 
         Legend legend = chart.getLegend();
         legend.setForm(Legend.LegendForm.CIRCLE);
 
-        //Starting load task when view is created
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setDrawGridLines(false);
+        xAxis.setDrawLabels(false);
+        xAxis.setDrawAxisLine(false);
+
+
+        YAxis left = chart.getAxisLeft();
+        //left.setDrawAxisLine(false);
+        //left.setDrawGridLines(false);
+        left.setSpaceTop(50);
+
+        YAxis right = chart.getAxisRight();
+        right.setDrawGridLines(false);
+        right.setDrawAxisLine(false);
+        right.setDrawLabels(false);
+        right.setSpaceTop(50);
+
+
         updateChart();
 
         return view;
@@ -67,10 +89,10 @@ public class DataChartFragment extends Fragment implements DatabaseCallback {
             List<Entry> entriesPm25 = new ArrayList<>();
             List<Entry> entriesPm10 = new ArrayList<>();
 
-            for (int i = 1; i < dustValuesList.size(); i++) {
-                DustValues values = dustValuesList.get(dustValuesList.size() - i); //reverse data
-                entriesPm10.add(new Entry(i, values.getPm10()));
-                entriesPm25.add(new Entry(i, values.getPm25()));
+            for (int i = 0; i < dustValuesList.size(); i++) {
+                DustValues values = dustValuesList.get(dustValuesList.size() - 1 - i); //reverse data
+                entriesPm10.add(new Entry(i + 1, values.getPm10()));
+                entriesPm25.add(new Entry(i + 1, values.getPm25()));
             }
 
             LineDataSet dataSetPm25 = new LineDataSet(entriesPm25, "PM 2,5"); // add entries to dataset

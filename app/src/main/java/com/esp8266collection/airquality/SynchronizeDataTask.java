@@ -4,19 +4,11 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.esp8266collection.airquality.Callbacks.UpdateCallback;
-import com.esp8266collection.airquality.DataParser;
 import com.esp8266collection.airquality.Database.DatabaseFunctions;
 import com.esp8266collection.airquality.Database.SQLiteHelper;
 import com.esp8266collection.airquality.Enums.SensorName;
 import com.esp8266collection.airquality.Sensors.SensorsCollection;
-import com.esp8266collection.airquality.ServerConnection;
-import com.esp8266collection.airquality.UpdateData;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Calendar;
 
 public class SynchronizeDataTask extends AsyncTask<Void, Void, Void> {
