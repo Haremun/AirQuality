@@ -8,8 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.esp8266collection.airquality.OnClickListeners.BackButtonListener;
+import com.esp8266collection.airquality.OnClickListeners.ChooseNetworkOnClickListener;
 import com.esp8266collection.airquality.R;
 import com.esp8266collection.airquality.Views.BtnSettings;
 import com.esp8266collection.airquality.Views.SpinnerGui;
@@ -40,6 +42,9 @@ public class SettingsFragment extends Fragment {
 
         FrameLayout btnBack = view.findViewById(R.id.layout_btn_back);
         btnBack.setOnClickListener(new BackButtonListener(getContext()));
+
+        TextView textChooseNetwork = view.findViewById(R.id.text_choose_network);
+        textChooseNetwork.setOnClickListener(new ChooseNetworkOnClickListener(this));
         return view;
     }
 

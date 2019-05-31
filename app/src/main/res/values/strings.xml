@@ -24,6 +24,13 @@
     <string name="sample_100">100%</string>
     <string name="network_hint">Choose network</string>
     <string name="network_name">Network name:</string>
+    <string name="ssid">SSID:</string>
+    <string name="password">Password:</string>
+    <string name="hint_network_name">Network name</string>
+    <string name="hint_password">Password</string>
+    <string name="accept">Accept</string>
+    <string name="cancel">Cancel</string>
+    <string name="title_set_network">Set network</string>
 
     <string-array name="time_intervals">
         <item>30 sec</item>

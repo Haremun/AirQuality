@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:padding="15dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ssid"
+        android:padding="5dp"
+        android:layout_row="0"
+        android:layout_column="0"/>
+    <EditText
+        android:id="@+id/edit_network_name"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:ems="8"
+        android:hint="@string/hint_network_name"
+        android:layout_row="0"
+        android:layout_column="1"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/password"
+        android:padding="5dp"
+        android:layout_row="1"
+        android:layout_column="0"/>
+    <EditText
+        android:id="@+id/edit_password"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:ems="8"
+        android:inputType="textPassword"
+        android:hint="@string/hint_password"
+        android:layout_row="1"
+        android:layout_column="1"/>
+
+
+</GridLayout>
