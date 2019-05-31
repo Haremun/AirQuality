@@ -1,4 +1,4 @@
-package com.esp8266collection.airquality;
+package com.esp8266collection.airquality.Fragments;
 
 
 import android.content.Context;
@@ -28,9 +28,18 @@ import com.esp8266collection.airquality.Enums.ConnectionMode;
 import com.esp8266collection.airquality.Enums.MainCircleData;
 import com.esp8266collection.airquality.Enums.SensorName;
 import com.esp8266collection.airquality.Enums.TemperatureMode;
+import com.esp8266collection.airquality.GetLastUpdateFromServer;
+import com.esp8266collection.airquality.R;
+import com.esp8266collection.airquality.RotationThread;
 import com.esp8266collection.airquality.Sensors.SensorsCollection;
+import com.esp8266collection.airquality.SynchronizeDataTask;
+import com.esp8266collection.airquality.ToastDrawerAnimation;
+import com.esp8266collection.airquality.UpdateData;
+import com.esp8266collection.airquality.Views.BtnSettings;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
 
 
@@ -107,6 +116,10 @@ public class DataFragment extends Fragment
         imgCircle = view.findViewById(R.id.imgCircle);
         imgDustSmallCircle = view.findViewById(R.id.small_dust_circle);
         imgBatteryStatus = view.findViewById(R.id.img_battery_status);
+
+        //Buttons
+        FrameLayout btnSettings = view.findViewById(R.id.layout_settings);
+        BtnSettings btnSettings1 = new BtnSettings(getContext(), btnSettings);
 
         //Main circle and onClick listener
         final TextView textPmType = view.findViewById(R.id.textPmType); //PM type
@@ -353,8 +366,14 @@ public class DataFragment extends Fragment
 //Colors update-------------------------------------------------------------------------------------
                         imgCircle.setColorFilter(greenToRedColor(dustPercentMainCircle));
                         imgDustSmallCircle.setColorFilter(greenToRedColor(dustPercentSmallCircle));
-
-                        textUpdate.setText(calendar.getTime().toString());
+//Date update---------------------------------------------------------------------------------------
+                        Calendar today = Calendar.getInstance();
+                        SimpleDateFormat simpleDateFormat;
+                        if (calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR))
+                            simpleDateFormat = new SimpleDateFormat("kk:mm", Locale.ENGLISH);
+                        else
+                            simpleDateFormat = new SimpleDateFormat("kk:mm dd.MM.yyyy", Locale.ENGLISH);
+                        textUpdate.setText(simpleDateFormat.format(calendar.getTime()));
 
 //Sliding pollution circle update-------------------------------------------------------------------
                         float pollutionPercent =

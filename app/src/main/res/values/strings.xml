@@ -11,7 +11,7 @@
     <string name="fahrenheit_unit">℉</string>
     <string name="dust_unit">μg/m³</string>
     <string name="dust_circle">Dust circle</string>
-    <string name="updateText">Update:&#160;</string>
+    <string name="updateText">Update time:&#160;</string>
     <string name="string_pollution_low">good</string>
     <string name="string_pollution_high">bad</string>
     <string name="content_desc_settings">settings</string>
@@ -22,4 +22,17 @@
     <string name="pm10">PM 10:</string>
     <string name="battery_status">battery status</string>
     <string name="sample_100">100%</string>
+    <string name="network_hint">Choose network</string>
+    <string name="network_name">Network name:</string>
+
+    <string-array name="time_intervals">
+        <item>30 sec</item>
+        <item>1 min</item>
+        <item>3 min</item>
+        <item>5 min</item>
+        <item>10 min</item>
+        <item>15 min</item>
+        <item>30 min</item>
+        <item>60 min</item>
+    </string-array>
 </resources>

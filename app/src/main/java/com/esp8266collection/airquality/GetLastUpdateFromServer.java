@@ -17,7 +17,7 @@ public class GetLastUpdateFromServer extends Thread {
     private boolean run = true;
     private DataParser dataParser;
 
-    GetLastUpdateFromServer(UpdateCallback updateCallback) {
+    public GetLastUpdateFromServer(UpdateCallback updateCallback) {
         this.updateCallback = updateCallback;
 
         this.dataParser = new DataParser();

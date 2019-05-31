@@ -4,8 +4,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import com.esp8266collection.airquality.Fragments.DataChartFragment;
+import com.esp8266collection.airquality.Fragments.DataFragment;
 
+public class MainActivity extends AppCompatActivity {
 
 
     @Override
@@ -14,14 +16,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         DataFragment dataFragment = new DataFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_data_container, dataFragment);
-        transaction.commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_data_container, dataFragment)
+                .commit();
 
         DataChartFragment dataChartFragment = new DataChartFragment();
-        FragmentTransaction transaction2 = getSupportFragmentManager().beginTransaction();
-        transaction2.replace(R.id.fragment_chart_container, dataChartFragment);
-        transaction2.commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_chart_container, dataChartFragment)
+                .commit();
 
         dataFragment.setDataChartFragment(dataChartFragment);
 

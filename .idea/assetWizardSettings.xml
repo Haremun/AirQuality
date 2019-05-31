@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_battery_20_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_done_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,8 +28,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="9c9c9c" />
-                            <entry key="outputName" value="ic_battery_20" />
+                            <entry key="color" value="ffffff" />
+                            <entry key="outputName" value="ic_done" />
                             <entry key="sourceFile" value="C:\Users\Sławomir Stępski" />
                           </map>
                         </option>

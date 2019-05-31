@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.esp8266collection.airquality.Callbacks.BluetoothCallback;
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
-import com.esp8266collection.airquality.DataFragment;
+import com.esp8266collection.airquality.Fragments.DataFragment;
 
 import java.io.IOException;
 import java.util.Set;

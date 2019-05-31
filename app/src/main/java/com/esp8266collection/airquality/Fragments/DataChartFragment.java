@@ -1,4 +1,4 @@
-package com.esp8266collection.airquality;
+package com.esp8266collection.airquality.Fragments;
 
 
 import android.graphics.Color;
@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import com.esp8266collection.airquality.Callbacks.DatabaseCallback;
 import com.esp8266collection.airquality.Database.LoadDustValuesTask;
 import com.esp8266collection.airquality.Database.SQLiteHelper;
+import com.esp8266collection.airquality.DustValues;
+import com.esp8266collection.airquality.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
