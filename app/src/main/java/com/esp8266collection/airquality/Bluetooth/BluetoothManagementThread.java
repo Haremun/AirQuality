@@ -6,6 +6,7 @@ import android.util.Log;
 import com.esp8266collection.airquality.Callbacks.UpdateCallback;
 import com.esp8266collection.airquality.DataParser;
 import com.esp8266collection.airquality.Sensors.SensorsCollection;
+import com.esp8266collection.airquality.SettingsMessage;
 import com.esp8266collection.airquality.UpdateData;
 
 import java.io.BufferedReader;
@@ -21,6 +22,7 @@ public class BluetoothManagementThread extends Thread {
     private BufferedReader reader;
     private DataParser dataParser;
     private BluetoothSocket bluetoothSocket;
+    private boolean run;
 
     private UpdateCallback updateCallback;
 
@@ -31,15 +33,25 @@ public class BluetoothManagementThread extends Thread {
         this.updateCallback = updateCallback;
         this.dataParser = new DataParser();
 
-        connectAndGetStreams(socket);
+        run = true;
+
+        try {
+            mInputStream = socket.getInputStream();
+            mOutputStream = socket.getOutputStream();
+
+            reader = new BufferedReader(new InputStreamReader(mInputStream));
+            dataParser = new DataParser();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
     @Override
     public void run() {
         try {
-            while (true) {
-                if (bluetoothSocket.isConnected()){
+            while (run) {
+                if (bluetoothSocket.isConnected()) {
                     String line = reader.readLine();
 
                     Log.i("BluetoothTest", line);
@@ -55,10 +67,38 @@ public class BluetoothManagementThread extends Thread {
 
     }
 
+    public void writeMessage(String message) {
+        if (bluetoothSocket.isConnected())
+            try {
+                mOutputStream.write(message.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+
+    public void writeMessage(SettingsMessage settingsMessage) {
+        if (bluetoothSocket.isConnected()) {
+            StringBuilder builder = new StringBuilder()
+                    .append(settingsMessage.getNetworkName())
+                    .append("&")
+                    .append(settingsMessage.getNetworkPassword())
+                    .append("&")
+                    .append(settingsMessage.getIntervalIndex());
+            try {
+                mOutputStream.write(builder.toString().getBytes());
+                Log.i("BluetoothTest", builder.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     public void closeConnection() {
 
         if (bluetoothSocket.isConnected())
             try {
+                run = false;
                 mInputStream.close();
                 mOutputStream.flush();
                 mOutputStream.close();
@@ -69,17 +109,4 @@ public class BluetoothManagementThread extends Thread {
 
     }
 
-    private void connectAndGetStreams(BluetoothSocket socket) {
-        try {
-            socket.connect();
-
-            mInputStream = socket.getInputStream();
-            mOutputStream = socket.getOutputStream();
-
-            reader = new BufferedReader(new InputStreamReader(mInputStream));
-            dataParser = new DataParser();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

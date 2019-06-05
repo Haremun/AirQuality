@@ -36,6 +36,8 @@ public class GetLastUpdateFromServer extends Thread {
                     updateCallback.Update(new UpdateData(sensorsCollection, dataParser.getCalendar()));
 
                     serverConnection.close();
+                } else {
+                    updateCallback.onConnectionError();
                 }
                 try {
                     Thread.sleep(5000);
@@ -49,14 +51,6 @@ public class GetLastUpdateFromServer extends Thread {
 
     }
 
-    private boolean checkConnection(HttpURLConnection connection) {
-        try {
-            connection.connect();
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
 
     public void setRun(boolean run) {
         this.run = run;

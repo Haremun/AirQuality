@@ -1,8 +1,8 @@
 package com.esp8266collection.airquality;
 
 public class SettingsMessage {
-    private String networkName = "";
-    private String networkPassword = "";
+    private String networkName = "-";
+    private String networkPassword = "-";
     private int intervalIndex = -1;
 
     public SettingsMessage(){

@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.esp8266collection.airquality.Bluetooth.BluetoothManagementThread;
 import com.esp8266collection.airquality.OnClickListeners.AcceptButtonListener;
 import com.esp8266collection.airquality.OnClickListeners.BackButtonListener;
 import com.esp8266collection.airquality.OnClickListeners.ChooseNetworkOnClickListener;
@@ -31,10 +32,10 @@ import com.esp8266collection.airquality.Views.SpinnerGui;
 public class SettingsFragment extends Fragment {
 
     private BtnSettings btnSettings;
-    private String networkName;
-    private String networkPassword;
     private TextView textChooseNetwork;
     private SettingsMessage settingsMessage;
+    private AcceptButtonListener acceptButtonListener;
+    private BluetoothManagementThread bluetoothManagementThread;
 
 
     public SettingsFragment() {
@@ -59,8 +60,9 @@ public class SettingsFragment extends Fragment {
         btnBack.setOnClickListener(new BackButtonListener(getContext()));
 
         FrameLayout btnAccept = view.findViewById(R.id.layout_btn_accept);
-        btnAccept.setOnClickListener(
-                new AcceptButtonListener(getContext(), settingsMessage));
+        acceptButtonListener = new AcceptButtonListener(getContext(), settingsMessage);
+        acceptButtonListener.setBluetoothManagementThread(bluetoothManagementThread);
+        btnAccept.setOnClickListener(acceptButtonListener);
 
         textChooseNetwork = view.findViewById(R.id.text_choose_network);
         textChooseNetwork.setOnClickListener(new ChooseNetworkOnClickListener(this));
@@ -70,14 +72,14 @@ public class SettingsFragment extends Fragment {
             String name = sharedPreferences.getString("Network", "");
             int index = sharedPreferences.getInt("Intervals", 0);
 
-            if (name != null){
+            if (name != null) {
                 textChooseNetwork.setText(name);
                 spinnerGui.setSpinnerItem(index);
+                settingsMessage.setIntervalIndex(index);
             }
 
 
         }
-
 
         return view;
     }
@@ -86,6 +88,11 @@ public class SettingsFragment extends Fragment {
         this.btnSettings = btnSettings;
     }
 
+    public void setBluetoothManagementThread(BluetoothManagementThread bluetoothManagementThread) {
+        if (acceptButtonListener != null)
+            acceptButtonListener.setBluetoothManagementThread(bluetoothManagementThread);
+        this.bluetoothManagementThread = bluetoothManagementThread;
+    }
 
     @Override
     public void onPause() {
@@ -97,8 +104,8 @@ public class SettingsFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            networkName = data.getStringExtra("Network");
-            networkPassword = data.getStringExtra("Password");
+            String networkName = data.getStringExtra("Network");
+            String networkPassword = data.getStringExtra("Password");
 
             textChooseNetwork.setText(networkName);
             textChooseNetwork.setTextColor(Color.BLACK);

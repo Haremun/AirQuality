@@ -5,25 +5,34 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.esp8266collection.airquality.Bluetooth.BluetoothManagementThread;
+import com.esp8266collection.airquality.Fragments.DataFragment;
 import com.esp8266collection.airquality.Fragments.SettingsFragment;
 import com.esp8266collection.airquality.R;
 
 public class BtnSettings implements View.OnClickListener {
 
-    private FrameLayout button;
+    //private FrameLayout button;
     private Context context;
     private boolean isClicked = false;
+    private SettingsFragment settingsFragment;
 
     public BtnSettings(Context context, FrameLayout button) {
-        this.button = button;
+        //this.button = button;
         this.context = context;
-        this.button.setOnClickListener(this);
+
+        settingsFragment = new SettingsFragment();
+
+        button.setOnClickListener(this);
+    }
+
+    public SettingsFragment getSettingsFragment() {
+        return settingsFragment;
     }
 
     @Override
     public void onClick(View v) {
-        if(!isClicked){
-            SettingsFragment settingsFragment = new SettingsFragment();
+        if (!isClicked) {
             settingsFragment.setBtnSettings(this);
             ((AppCompatActivity) context).getSupportFragmentManager()
                     .beginTransaction()

@@ -80,6 +80,7 @@ public class DataFragment extends Fragment
 
     private SQLiteHelper helper;
     private DataChartFragment dataChartFragment;
+    private SettingsFragment settingsFragment;
 
     private UpdateData mUpdateData;
     private Calendar actualUpdateDate;
@@ -118,8 +119,10 @@ public class DataFragment extends Fragment
         imgBatteryStatus = view.findViewById(R.id.img_battery_status);
 
         //Buttons
-        FrameLayout btnSettings = view.findViewById(R.id.layout_settings);
-        BtnSettings btnSettings1 = new BtnSettings(getContext(), btnSettings);
+        FrameLayout layoutSettings = view.findViewById(R.id.layout_settings);
+        BtnSettings btnSettings = new BtnSettings(getContext(), layoutSettings);
+        settingsFragment = btnSettings.getSettingsFragment();
+
 
         //Main circle and onClick listener
         final TextView textPmType = view.findViewById(R.id.textPmType); //PM type
@@ -265,13 +268,6 @@ public class DataFragment extends Fragment
         final Calendar calendar = updateData.getCalendar();
         final SensorsCollection sensorsCollection = updateData.getSensorsCollection();
 
-        if (connectionError) {
-
-            rotationThread.stopAnimation();
-            toastDrawerAnimation.startToast(ToastDrawerAnimation.HIDE);
-
-            connectionError = false;
-        }
 
         this.sensorsCollection = sensorsCollection;
 
@@ -282,13 +278,11 @@ public class DataFragment extends Fragment
         }
 
 
-        if (calendar.compareTo(actualUpdateDate) > 0 || firstUpdate) {
+        if (calendar.compareTo(actualUpdateDate) > 0 || firstUpdate || connectionError) {
 
-            Log.i("Test", calendar.getTime().toString());
-            Log.i("Test", actualUpdateDate.getTime().toString());
             actualUpdateDate = calendar;
             mUpdateData = updateData;
-            if (!firstUpdate) {
+            if (!firstUpdate && !connectionError) {
                 //Adding new data to local database
                 DatabaseFunctions databaseFunctions = new DatabaseFunctions(helper);
                 databaseFunctions.addToDatabase(updateData);
@@ -392,7 +386,13 @@ public class DataFragment extends Fragment
             }
 
         }
+        if (connectionError) {
 
+            rotationThread.stopAnimation();
+            toastDrawerAnimation.startToast(ToastDrawerAnimation.HIDE);
+
+            connectionError = false;
+        }
 
     }
 
@@ -479,5 +479,10 @@ public class DataFragment extends Fragment
     public void onBluetoothConnect(BluetoothManagementThread bluetoothManagementThread) {
         toastDrawerAnimation.startToast(ToastDrawerAnimation.SHOW_AND_HIDE, "Bluetooth connected");
         this.bluetoothManagementThread = bluetoothManagementThread;
+        if (settingsFragment != null) {
+            settingsFragment.setBluetoothManagementThread(bluetoothManagementThread);
+            Log.i("BluetoothTest", "settings");
+        }
+
     }
 }
